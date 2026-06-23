@@ -13,9 +13,11 @@ namespace PropertyManagement.Api.Data
 
         public DbSet<Unit> Units => Set<Unit>();
 
-        public DbSet<Guest> Guest => Set<Guest>();
+        public DbSet<Guest> Guests => Set<Guest>();
 
-        public DbSet<Booking> Booking => Set<Booking>();
+        public DbSet<Booking> Bookings => Set<Booking>();
+
+        public DbSet<AllowedEmail> AllowedEmails => Set<AllowedEmail>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -25,7 +27,6 @@ namespace PropertyManagement.Api.Data
             builder.Entity<Unit>()
                 .HasIndex(x => x.UnitNumber)
                 .IsUnique();
-
 
             builder.Entity<Booking>()
                 .HasOne(x => x.CreatedByUser)

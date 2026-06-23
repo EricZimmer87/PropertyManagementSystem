@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.Models;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,20 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 // Add Swagger
-builder.Services.AddSwaggerGen(options =>
-{
-    options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        Description = "JWT Authorization header using the Bearer scheme."
-    });
-    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-    {
-        [new OpenApiSecuritySchemeReference("bearer", document)] = []
-    });
-});
+//builder.Services.AddSwaggerGen();
 
 // Database connection string
 var connectionString =
@@ -38,10 +25,33 @@ var connectionString =
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// Activate Identity APIs
-builder.Services.AddIdentityApiEndpoints<AppUser>()
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>();
+// Activate Identity
+builder.Services
+    .AddIdentity<AppUser, IdentityRole>(options =>
+    {
+        // Password
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequiredLength = 6;
+        options.Password.RequiredUniqueChars = 1;
+
+        // Lockout
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.AllowedForNewUsers = true;
+
+        // User
+        options.User.AllowedUserNameCharacters =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+        options.User.RequireUniqueEmail = false;
+
+        // Change to true after setting up email provider
+        options.SignIn.RequireConfirmedAccount = false;
+    })
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
 // For Google OAuth
 //builder.Services.AddAuthentication()
@@ -50,6 +60,15 @@ builder.Services.AddIdentityApiEndpoints<AppUser>()
 //        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
 //        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
 //    });
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // Cookie settings
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+    options.SlidingExpiration = true;
+});
 
 // Add authorization services to dependency injection container
 builder.Services.AddAuthorization();
@@ -60,8 +79,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
