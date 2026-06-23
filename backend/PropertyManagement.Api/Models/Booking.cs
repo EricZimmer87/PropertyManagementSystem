@@ -15,6 +15,7 @@
         public int? Occupants { get; set; }
         public string Status { get; set; } = "Booked";
         public string? Notes { get; set; }
+        public int? CardLastFour { get; set; }
 
         public DateTime CreatedOn { get; set; }
         public DateTime? ModifiedOn { get; set; }

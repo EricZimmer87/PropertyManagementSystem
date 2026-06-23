@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
@@ -11,9 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
-// Add Swagger
-//builder.Services.AddSwaggerGen();
 
 // Database connection string
 var connectionString =
@@ -63,10 +61,14 @@ builder.Services
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    // Cookie settings
+    //options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.Cookie.Name = "PropertyManagementCookie";
     options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    //options.LoginPath = "/Identity/Account/Login";
+    // ReturnUrlParameter requires 
+    //using Microsoft.AspNetCore.Authentication.Cookies;
+    options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
     options.SlidingExpiration = true;
 });
 
