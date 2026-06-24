@@ -36,6 +36,7 @@ namespace PropertyManagement.Api.Seeding
                     if (!context.Set<AllowedEmail>().Any())
                     {
                         context.Add(new AllowedEmail { Email = "ericzimmer87@fastmail.com", CreatedAt = DateTime.UtcNow });
+                        context.SaveChanges();
                     }
                 })
                 .UseAsyncSeeding(async (context, _, cancellationToken) =>
@@ -65,6 +66,7 @@ namespace PropertyManagement.Api.Seeding
                     if (!await context.Set<AllowedEmail>().AnyAsync(cancellationToken))
                     {
                         context.Add(new AllowedEmail { Email = "ericzimmer87@fastmail.com", CreatedAt = DateTime.UtcNow });
+                        await context.SaveChangesAsync(cancellationToken);
                     }
                 });
         }

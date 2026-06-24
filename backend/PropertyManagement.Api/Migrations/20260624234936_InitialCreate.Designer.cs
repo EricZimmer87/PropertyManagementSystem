@@ -12,7 +12,7 @@ using PropertyManagement.Api.Data;
 namespace PropertyManagement.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260624234301_InitialCreate")]
+    [Migration("20260624234936_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
