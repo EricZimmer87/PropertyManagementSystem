@@ -12,7 +12,7 @@ using PropertyManagement.Api.Data;
 namespace PropertyManagement.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260623230728_InitialCreate")]
+    [Migration("20260624030704_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -260,6 +260,9 @@ namespace PropertyManagement.Api.Migrations
                     b.Property<DateTime?>("CanceledOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("CardLastFour")
+                        .HasColumnType("int");
+
                     b.Property<string>("CreatedByUserId")
                         .HasColumnType("nvarchar(450)");
 
@@ -337,10 +340,15 @@ namespace PropertyManagement.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("NormalizedPhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("State")
@@ -350,6 +358,9 @@ namespace PropertyManagement.Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("GuestId");
+
+                    b.HasIndex("NormalizedPhoneNumber")
+                        .IsUnique();
 
                     b.ToTable("Guests");
                 });

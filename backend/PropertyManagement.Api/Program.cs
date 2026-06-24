@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.Models;
+using PropertyManagement.Api.Seeding;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,7 +22,10 @@ var connectionString =
 
 // Register the DbContext with the dependency injection container
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+{
+    options.UseSqlServer(connectionString);
+    DbSeeding.Configure(options); // Seed database for development testing
+});
 
 // Activate Identity
 builder.Services
