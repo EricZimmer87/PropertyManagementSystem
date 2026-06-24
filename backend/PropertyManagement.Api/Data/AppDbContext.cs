@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services;
@@ -53,7 +54,7 @@ namespace PropertyManagement.Api.Data
                 .OnDelete(DeleteBehavior.NoAction);
         }
 
-        // Normalize phone numbers
+        // Normalize guest phone numbers
         private void NormalizeGuestPhoneNumbers()
         {
             foreach (var entry in ChangeTracker.Entries<Guest>()
@@ -65,21 +66,36 @@ namespace PropertyManagement.Api.Data
             }
         }
 
+        // Normalized AllowedEmails
+        private void NormalizeAllowedEmails()
+        {
+            foreach (var entry in ChangeTracker.Entries<AllowedEmail>()
+                .Where(e => e.State == EntityState.Added ||
+                            e.State == EntityState.Modified))
+            {
+                entry.Entity.NormalizedEmail =
+                    EmailHelper.Normalize(entry.Entity.Email);
+            }
+        }
+
         // Override SaveChanges() and SaveChangesAsync() to automatically normalize phone number of guest
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
             NormalizeGuestPhoneNumbers();
+            NormalizeAllowedEmails();
             return base.SaveChanges(acceptAllChangesOnSuccess);
         }
         public override int SaveChanges()
         {
             NormalizeGuestPhoneNumbers();
+            NormalizeAllowedEmails();
             return base.SaveChanges();
         }
         public override Task<int> SaveChangesAsync(
             CancellationToken cancellationToken = default)
         {
             NormalizeGuestPhoneNumbers();
+            NormalizeAllowedEmails();
             return base.SaveChangesAsync(cancellationToken);
         }
 

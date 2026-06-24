@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.Models;
 using Scalar.AspNetCore;
+using PropertyManagement.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,6 +75,9 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 // Add authorization services to dependency injection container
 builder.Services.AddAuthorization();
+
+// Add email service
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 var app = builder.Build();
 

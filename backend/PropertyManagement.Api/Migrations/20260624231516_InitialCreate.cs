@@ -18,6 +18,7 @@ namespace PropertyManagement.Api.Migrations
                     AllowedEmailId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -73,7 +74,8 @@ namespace PropertyManagement.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NormalizedPhoneNumber = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     State = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -221,6 +223,7 @@ namespace PropertyManagement.Api.Migrations
                     Occupants = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CardLastFour = table.Column<int>(type: "int", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CanceledOn = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -323,6 +326,12 @@ namespace PropertyManagement.Api.Migrations
                 name: "IX_Bookings_UnitId",
                 table: "Bookings",
                 column: "UnitId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Guests_NormalizedPhoneNumber",
+                table: "Guests",
+                column: "NormalizedPhoneNumber",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Units_UnitNumber",
