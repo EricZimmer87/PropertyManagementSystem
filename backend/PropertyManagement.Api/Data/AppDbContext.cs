@@ -31,18 +31,18 @@ namespace PropertyManagement.Api.Data
                 .HasIndex(g => g.NormalizedPhoneNumber)
                 .IsUnique();
 
+            // Explicitly configure booking audit-user relationships without cascade delete.
+            // Users cannot be deleted while referenced by bookings to keep historical records accurate.
             builder.Entity<Booking>()
                 .HasOne(x => x.CreatedByUser)
                 .WithMany(x => x.CreatedBookings)
                 .HasForeignKey(x => x.CreatedByUserId)
                 .OnDelete(DeleteBehavior.NoAction);
-
             builder.Entity<Booking>()
                 .HasOne(x => x.ModifiedByUser)
                 .WithMany(x => x.ModifiedBookings)
                 .HasForeignKey(x => x.ModifiedByUserId)
                 .OnDelete(DeleteBehavior.NoAction);
-
             builder.Entity<Booking>()
                 .HasOne(x => x.CanceledByUser)
                 .WithMany(x => x.CanceledBookings)
