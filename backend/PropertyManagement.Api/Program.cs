@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Seeding;
-using Scalar.AspNetCore;
 using PropertyManagement.Api.Services;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 

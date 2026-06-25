@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services;
+using System.Diagnostics;
 using System.Net;
 
 namespace PropertyManagement.Api.Controllers
@@ -17,14 +18,12 @@ namespace PropertyManagement.Api.Controllers
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
         private readonly UserManager<AppUser> _userManager;
-        private readonly IUserStore<AppUser> _userStore;
         private readonly ILogger<AuthController> _logger;
 
         public AuthController(AppDbContext context,
             IEmailService emailService,
             IConfiguration configuration,
             UserManager<AppUser> userManager,
-            IUserStore<AppUser> userStore,
             ILogger<AuthController> logger
             )
         {
@@ -32,8 +31,35 @@ namespace PropertyManagement.Api.Controllers
             _emailService = emailService;
             _configuration = configuration;
             _userManager = userManager;
-            _userStore = userStore;
             _logger = logger;
+        }
+
+        private ActionResult CreateValidationProblem(IdentityResult result)
+        {
+            // We expect a single error code and description in the normal case.
+            // This could be golfed with GroupBy and ToDictionary, but perf! :P
+            Debug.Assert(!result.Succeeded);
+            var errorDictionary = new Dictionary<string, string[]>(1);
+
+            foreach (var error in result.Errors)
+            {
+                string[] newDescriptions;
+
+                if (errorDictionary.TryGetValue(error.Code, out var descriptions))
+                {
+                    newDescriptions = new string[descriptions.Length + 1];
+                    Array.Copy(descriptions, newDescriptions, descriptions.Length);
+                    newDescriptions[descriptions.Length] = error.Description;
+                }
+                else
+                {
+                    newDescriptions = [error.Description];
+                }
+
+                errorDictionary[error.Code] = newDescriptions;
+            }
+
+            return ValidationProblem(new ValidationProblemDetails(errorDictionary));
         }
 
         [HttpPost("register")]
@@ -70,14 +96,11 @@ namespace PropertyManagement.Api.Controllers
                 Email = email
             };
 
-            var result = await _userManager.CreateAsync(user, registration.Password);
+            IdentityResult result = await _userManager.CreateAsync(user, registration.Password);
 
             if (!result.Succeeded)
             {
-                return BadRequest(new
-                {
-                    Errors = result.Errors.Select(e => e.Description)
-                });
+                return CreateValidationProblem(result);
             }
 
             // Generate a one-time email confirmation token.
@@ -134,13 +157,14 @@ namespace PropertyManagement.Api.Controllers
             var result = await _userManager.ConfirmEmailAsync(user, token);
 
             if (!result.Succeeded)
-                return BadRequest("Invalid or expired confirmation link.");
+                return CreateValidationProblem(result);
 
             return Ok("Email was successfully confirmed!");
         }
 
         // TODO ResendEmailConfirmation()
 
+        // TODO
         [HttpGet]
         [Route("login")]
         public async Task<ActionResult> Login()
