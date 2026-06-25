@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
@@ -7,6 +6,7 @@ using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services;
 using System.Diagnostics;
 using System.Net;
+using PropertyManagement.Api.DTOs.Auth;
 
 namespace PropertyManagement.Api.Controllers
 {
@@ -62,15 +62,38 @@ namespace PropertyManagement.Api.Controllers
             return ValidationProblem(new ValidationProblemDetails(errorDictionary));
         }
 
-        [HttpPost("register")]
-        public async Task<ActionResult> Register([FromBody] RegisterRequest registration)
+        private async Task<string> GenerateEmailConfirmationLinkAsync(AppUser user)
         {
-            var email = registration.Email;
+            // Generate a one-time email confirmation token.
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var encodedToken = WebUtility.UrlEncode(token);
+            var frontendUrl = _configuration["AppSettings:FrontendUrl"];
+            return
+                $"{frontendUrl}/confirm-email?userId={user.Id}&token={encodedToken}";
+
+        }
+
+        [HttpPost("register")]
+        public async Task<ActionResult> Register(RegisterUserRequest registration)
+        {
+            var email = registration.Email.Trim();
+            var firstName = registration.FirstName.Trim();
+            var lastName = registration.LastName.Trim();
 
             // Check for valid email address
             if (string.IsNullOrEmpty(email) || !EmailHelper.IsValidEmail(email))
             {
                 return BadRequest(_userManager.ErrorDescriber.InvalidEmail(email));
+            }
+
+            // Validate first and last name input
+            if (string.IsNullOrWhiteSpace(firstName))
+            {
+                return BadRequest("First name is required.");
+            }
+            if (string.IsNullOrWhiteSpace(lastName))
+            {
+                return BadRequest("Last name is required.");
             }
 
             var normalizedEmail = _userManager.NormalizeEmail(email);
@@ -93,22 +116,19 @@ namespace PropertyManagement.Api.Controllers
             var user = new AppUser
             {
                 UserName = email,
-                Email = email
+                Email = email,
+                FirstName = firstName,
+                LastName = lastName
             };
 
-            IdentityResult result = await _userManager.CreateAsync(user, registration.Password);
+            var result = await _userManager.CreateAsync(user, registration.Password);
 
             if (!result.Succeeded)
             {
                 return CreateValidationProblem(result);
             }
 
-            // Generate a one-time email confirmation token.
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var encodedToken = WebUtility.UrlEncode(token);
-            var frontendUrl = _configuration["AppSettings:FrontendUrl"];
-            var confirmationLink =
-                $"{frontendUrl}/confirm-email?userId={user.Id}&token={encodedToken}";
+            var confirmationLink = await GenerateEmailConfirmationLinkAsync(user);
 
             try
             {
@@ -123,13 +143,49 @@ namespace PropertyManagement.Api.Controllers
                     user.Email);
 
                 return StatusCode(500,
-                    "Your account was created, but we couldn't send the confirmation email.");
+                    "Your account was created, but we couldn't send the confirmation email. " +
+                    "Please try the 'Resend confirmation email' option.");
             }
 
             return Ok(new
             {
                 Message = "Registration successful. Please check your email to confirm your account."
             });
+        }
+
+        [HttpPost("resend-confirmation-email")]
+        public async Task<ActionResult> ResendConfirmationEmail(ResendConfirmationEmailRequest request)
+        {
+            var email = request.Email.Trim();
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return BadRequest("No account exists for that email.");
+
+            if (await _userManager.IsEmailConfirmedAsync(user))
+            {
+                return BadRequest("Email has already been confirmed.");
+            }
+
+            var confirmationLink = await GenerateEmailConfirmationLinkAsync(user);
+
+            try
+            {
+                await _emailService.SendConfirmationEmailAsync(
+                    user.Email!,
+                    confirmationLink);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Failed to send confirmation email to {Email}",
+                    email);
+
+                return StatusCode(500,
+                    "We couldn't send the confirmation email. " +
+                    "Please try the 'Resend confirmation email' option.");
+            }
+
+            return Ok("Please check your email to confirm your account.");
         }
 
         [HttpGet("confirm-email")]
@@ -161,8 +217,6 @@ namespace PropertyManagement.Api.Controllers
 
             return Ok("Email was successfully confirmed!");
         }
-
-        // TODO ResendEmailConfirmation()
 
         // TODO
         [HttpGet]

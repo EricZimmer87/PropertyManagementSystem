@@ -4,7 +4,7 @@ using PropertyManagement.Api.Models;
 
 namespace PropertyManagement.Api.Seeding
 {
-    public static class DbSeeding
+    public class DbSeeding
     {
         public static void Configure(DbContextOptionsBuilder optionsBuilder)
         {
@@ -37,18 +37,6 @@ namespace PropertyManagement.Api.Seeding
                     {
                         context.Add(new AllowedEmail { Email = "ericzimmer87@fastmail.com", CreatedAt = DateTime.UtcNow });
                         context.SaveChanges();
-
-                        // Seed admin user
-                        var user = new AppUser
-                        {
-                            Email = "ericzimmer87@fastmail.com",
-                            UserName = "ericzimmer87@fastmail.com",
-                            FirstName = "Eric",
-                            LastName = "Zimmer",
-                            EmailConfirmed = true
-                        };
-
-                        await _userManager.CreateAsync(user, password);
                     }
                 })
                 .UseAsyncSeeding(async (context, _, cancellationToken) =>

@@ -85,6 +85,10 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 
 var app = builder.Build();
 
+// Seed admin user
+using var scope = app.Services.CreateScope();
+await AdminSeeder.SeedRolesAndAdminAsync(scope.ServiceProvider);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
