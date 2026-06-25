@@ -36,7 +36,7 @@ namespace PropertyManagement.Api.Controllers
             _logger = logger;
         }
 
-        [HttpPost("Register")]
+        [HttpPost("register")]
         public async Task<ActionResult> Register([FromBody] RegisterRequest registration)
         {
             var email = registration.Email;
@@ -64,16 +64,20 @@ namespace PropertyManagement.Api.Controllers
                 return BadRequest("An account with this email already exists.");
             }
 
-            var emailStore = (IUserEmailStore<AppUser>)_userStore;
+            var user = new AppUser
+            {
+                UserName = email,
+                Email = email
+            };
 
-            var user = new AppUser();
-            await _userStore.SetUserNameAsync(user, email, CancellationToken.None);
-            await emailStore.SetEmailAsync(user, email, CancellationToken.None);
             var result = await _userManager.CreateAsync(user, registration.Password);
 
             if (!result.Succeeded)
             {
-                return BadRequest(result.Errors.Select(e => e.Description));
+                return BadRequest(new
+                {
+                    Errors = result.Errors.Select(e => e.Description)
+                });
             }
 
             // Generate a one-time email confirmation token.
@@ -105,8 +109,40 @@ namespace PropertyManagement.Api.Controllers
             });
         }
 
+        [HttpGet("confirm-email")]
+        public async Task<ActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrWhiteSpace(userId) ||
+                string.IsNullOrWhiteSpace(token))
+            {
+                return BadRequest("Invalid confirmation link.");
+            }
+
+            // Get user from userID
+            var user = await _userManager.FindByIdAsync(userId);
+
+            // Ensure user exists
+            if (user == null)
+                return BadRequest("Invalid confirmation link.");
+
+            // Check if email has already been confirmed
+            if (await _userManager.IsEmailConfirmedAsync(user))
+            {
+                return Ok("Email has already been confirmed.");
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+
+            if (!result.Succeeded)
+                return BadRequest("Invalid or expired confirmation link.");
+
+            return Ok("Email was successfully confirmed!");
+        }
+
+        // TODO ResendEmailConfirmation()
+
         [HttpGet]
-        [Route("Login")]
+        [Route("login")]
         public async Task<ActionResult> Login()
         {
             return BadRequest("You shall not pass!");
