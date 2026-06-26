@@ -10,6 +10,8 @@ namespace PropertyManagement.Api.Services
             return email?.Trim().ToUpperInvariant() ?? string.Empty;
         }
 
+        // Adapted from Microsoft's ASP.NET documentation:
+        // https://learn.microsoft.com/en-us/dotnet/standard/base-types/how-to-verify-that-strings-are-in-valid-email-format
         public static bool IsValidEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))

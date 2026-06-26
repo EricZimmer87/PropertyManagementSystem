@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
+using PropertyManagement.Api.DTOs.Auth;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services;
 using System.Diagnostics;
 using System.Net;
-using PropertyManagement.Api.DTOs.Auth;
 
 namespace PropertyManagement.Api.Controllers
 {
@@ -34,6 +34,9 @@ namespace PropertyManagement.Api.Controllers
             _logger = logger;
         }
 
+        // Adapted from ASP.NET Core Identity's IdentityApiEndpointRouteBuilderExtensions.
+        // Converts IdentityResult errors into a ValidationProblemDetails response.
+        // https://github.com/dotnet/aspnetcore/blob/main/src/Identity/Core/src/IdentityApiEndpointRouteBuilderExtensions.cs
         private ActionResult CreateValidationProblem(IdentityResult result)
         {
             // We expect a single error code and description in the normal case.
@@ -77,26 +80,9 @@ namespace PropertyManagement.Api.Controllers
         public async Task<ActionResult> Register(RegisterUserRequest registration)
         {
             var email = registration.Email.Trim();
+            var normalizedEmail = _userManager.NormalizeEmail(email);
             var firstName = registration.FirstName.Trim();
             var lastName = registration.LastName.Trim();
-
-            // Check for valid email address
-            if (string.IsNullOrEmpty(email) || !EmailHelper.IsValidEmail(email))
-            {
-                return BadRequest(_userManager.ErrorDescriber.InvalidEmail(email));
-            }
-
-            // Validate first and last name input
-            if (string.IsNullOrWhiteSpace(firstName))
-            {
-                return BadRequest("First name is required.");
-            }
-            if (string.IsNullOrWhiteSpace(lastName))
-            {
-                return BadRequest("Last name is required.");
-            }
-
-            var normalizedEmail = _userManager.NormalizeEmail(email);
 
             // Check if registration email is allowed
             var allowed = await _context.AllowedEmails
@@ -223,6 +209,7 @@ namespace PropertyManagement.Api.Controllers
         [Route("login")]
         public async Task<ActionResult> Login()
         {
+            Console.WriteLine("Hello, Eric Zimmer!");
             return BadRequest("You shall not pass!");
         }
     }

@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PropertyManagement.Api.Services;
-using System.Net.Mail;
-using Microsoft.Extensions.Logging;
 
 namespace PropertyManagement.Api.Controllers
 {

@@ -51,7 +51,7 @@ builder.Services
         options.User.RequireUniqueEmail = false;
 
         // Change to true after setting up email provider
-        options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedAccount = true;
     })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
