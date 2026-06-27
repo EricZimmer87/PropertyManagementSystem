@@ -92,9 +92,7 @@ namespace PropertyManagement.Api.Controllers
             var allowed = await _context.AllowedEmails
                 .AnyAsync(a => a.NormalizedEmail == normalizedEmail);
             if (!allowed)
-            {
                 return BadRequest("Registration is not allowed for this email address.");
-            }
 
             // Check if user already exists
             var existingUser = await _userManager.FindByEmailAsync(email);
@@ -152,9 +150,7 @@ namespace PropertyManagement.Api.Controllers
                 return BadRequest("No account exists for that email.");
 
             if (await _userManager.IsEmailConfirmedAsync(user))
-            {
                 return BadRequest("Email has already been confirmed.");
-            }
 
             var confirmationLink = await GenerateEmailConfirmationLinkAsync(user);
 
@@ -196,9 +192,7 @@ namespace PropertyManagement.Api.Controllers
 
             // Check if email has already been confirmed
             if (await _userManager.IsEmailConfirmedAsync(user))
-            {
                 return Ok("Email has already been confirmed.");
-            }
 
             var result = await _userManager.ConfirmEmailAsync(user, token);
 
