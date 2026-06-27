@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
@@ -19,12 +20,14 @@ namespace PropertyManagement.Api.Controllers
         private readonly IConfiguration _configuration;
         private readonly UserManager<AppUser> _userManager;
         private readonly ILogger<AuthController> _logger;
+        private readonly SignInManager<AppUser> _signInManager;
 
         public AuthController(AppDbContext context,
             IEmailService emailService,
             IConfiguration configuration,
             UserManager<AppUser> userManager,
-            ILogger<AuthController> logger
+            ILogger<AuthController> logger,
+            SignInManager<AppUser> signInManager
             )
         {
             _context = context;
@@ -32,6 +35,7 @@ namespace PropertyManagement.Api.Controllers
             _configuration = configuration;
             _userManager = userManager;
             _logger = logger;
+            _signInManager = signInManager;
         }
 
         // Adapted from ASP.NET Core Identity's IdentityApiEndpointRouteBuilderExtensions.
@@ -201,16 +205,67 @@ namespace PropertyManagement.Api.Controllers
             if (!result.Succeeded)
                 return CreateValidationProblem(result);
 
-            return Ok("Email was successfully confirmed!");
+            return Ok(new
+            {
+                Message = "Email was successfully confirmed!"
+            });
         }
 
-        // TODO
-        [HttpGet]
+        [HttpPost]
         [Route("login")]
-        public async Task<ActionResult> Login()
+        public async Task<ActionResult> Login(LoginRequest request)
         {
-            Console.WriteLine("Hello, Eric Zimmer!");
-            return BadRequest("You shall not pass!");
+            // Ensure user exists
+            var email = request.Email.Trim();
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return Unauthorized("Email or password is incorrect.");
+
+            // Ensure email is confirmed
+            if (!await _userManager.IsEmailConfirmedAsync(user))
+                return Unauthorized("Please confirm your email before logging in.");
+
+            // Check if account is active
+            if (!user.IsActive)
+                return Unauthorized("Your account is no longer active.");
+
+            var result = await _signInManager.PasswordSignInAsync(user, request.Password, false, lockoutOnFailure: true);
+
+            if (result.IsLockedOut)
+                return Unauthorized("Your account is locked.");
+
+            if (!result.Succeeded)
+                return Unauthorized("Email or password is incorrect.");
+
+            _logger.LogInformation("User {Email} logged in at {Time}.",
+                user.Email, DateTime.UtcNow);
+
+            return NoContent();
         }
+
+        [Authorize]
+        [HttpDelete("logout")]
+        public async Task<ActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+
+            _logger.LogInformation("User {UserId} logged out.", _userManager.GetUserId(User));
+
+            return NoContent();
+        }
+
+        // TODO Forgot Password
+
+        // TODO Reset Password
+
+        // TODO Change Password
+
+        // TODO Change Email
+
+        // TODO Change First Name
+
+        // TODO Change Last Name
+
+        // TODO Change IsActive (Admin only)
     }
 }
