@@ -74,9 +74,10 @@ namespace PropertyManagement.Api.Controllers
             // Generate a one-time email confirmation token.
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var encodedToken = WebUtility.UrlEncode(token);
-            var frontendUrl = _configuration["AppSettings:FrontendUrl"];
+            // Change for correct front end later
+            var apiUrl = _configuration["AppSettings:ApiUrl"];
             return
-                $"{frontendUrl}/confirm-email?userId={user.Id}&token={encodedToken}";
+                $"{apiUrl}/Auth/confirm-email?userId={user.Id}&token={encodedToken}";
 
         }
 
@@ -260,6 +261,25 @@ namespace PropertyManagement.Api.Controllers
 
         // TODO Change Last Name
 
-        // TODO Change IsActive (Admin only)
+        // TODO Fix this to use User ID, not email, and put it in an AppUsersController
+        [Authorize(Roles = Roles.Admin)]
+        [HttpPut("users/{id}/active")]
+        public async Task<ActionResult> SetIsActive(IsActiveRequest request)
+        {
+            // Ensure user exists
+            var email = request.Email.Trim();
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return Unauthorized("Email or password is incorrect.");
+
+            user.IsActive = request.IsActive;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                Message = $"{user.Email}'s active status has been set to {user.IsActive}."
+            });
+        }
     }
 }

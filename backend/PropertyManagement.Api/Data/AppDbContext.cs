@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services;
@@ -21,6 +20,11 @@ namespace PropertyManagement.Api.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            // Allowed emails must be unique
+            builder.Entity<AllowedEmail>()
+                .HasIndex(x => x.NormalizedEmail)
+                .IsUnique();
 
             // UnitNumber must be unique
             builder.Entity<Unit>()
