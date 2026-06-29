@@ -20,7 +20,7 @@ namespace PropertyManagement.Api.Controllers
             _context = context;
         }
 
-        // GET /api/AllowedEmails/{id}
+        // GET /api/AllowedEmails/{id} - get allowed email by id
         [HttpGet("{id}")]
         public async Task<ActionResult<AllowedEmailResponse>> GetAllowedEmailById(long id)
         {
@@ -42,7 +42,7 @@ namespace PropertyManagement.Api.Controllers
         }
 
         // TODO Add pagination
-        // GET /api/AllowedEmails
+        // GET /api/AllowedEmails - get all allowed emails
         [HttpGet]
         public async Task<ActionResult<List<AllowedEmailResponse>>> GetAllowedEmails()
         {
@@ -59,8 +59,8 @@ namespace PropertyManagement.Api.Controllers
             return Ok(emails);
         }
 
-        // POST /api/AllowedEmails/add
-        [HttpPost("add")]
+        // POST /api/AllowedEmails/add - create a new allowed email
+        [HttpPost]
         public async Task<ActionResult<AllowedEmailResponse>> AddAllowedEmail(AddAllowedEmailRequest request)
         {
             var email = request.Email.Trim();
@@ -97,8 +97,8 @@ namespace PropertyManagement.Api.Controllers
                 response);
         }
 
-        // PUT /api/AllowedEmails/{id}
-        [HttpPut("{id}")]
+        // PATCH /api/AllowedEmails/{id} - update allowed email
+        [HttpPatch("{id}")]
         public async Task<ActionResult<AllowedEmailResponse>> UpdateAllowedEmail(UpdateAllowedEmailRequest request, long id)
         {
             var email = await _context.AllowedEmails
@@ -131,7 +131,7 @@ namespace PropertyManagement.Api.Controllers
             });
         }
 
-        // DELETE /api/AllowedEmails/{id}
+        // DELETE /api/AllowedEmails/{id} - delete allowed email
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAllowedEmail(long id)
         {

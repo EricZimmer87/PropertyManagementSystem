@@ -6,7 +6,6 @@ using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.Auth;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services;
-using System.Net;
 
 namespace PropertyManagement.Api.Controllers
 {
@@ -16,14 +15,12 @@ namespace PropertyManagement.Api.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IEmailService _emailService;
-        private readonly IConfiguration _configuration;
         private readonly UserManager<AppUser> _userManager;
         private readonly ILogger<AuthController> _logger;
         private readonly SignInManager<AppUser> _signInManager;
 
         public AuthController(AppDbContext context,
             IEmailService emailService,
-            IConfiguration configuration,
             UserManager<AppUser> userManager,
             ILogger<AuthController> logger,
             SignInManager<AppUser> signInManager
@@ -31,22 +28,9 @@ namespace PropertyManagement.Api.Controllers
         {
             _context = context;
             _emailService = emailService;
-            _configuration = configuration;
             _userManager = userManager;
             _logger = logger;
             _signInManager = signInManager;
-        }
-
-        private async Task<string> GenerateEmailConfirmationLinkAsync(AppUser user)
-        {
-            // Generate a one-time email confirmation token.
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var encodedToken = WebUtility.UrlEncode(token);
-            // Change for correct front end later
-            var apiUrl = _configuration["AppSettings:ApiUrl"];
-            return
-                $"{apiUrl}/Auth/confirm-email?userId={user.Id}&token={encodedToken}";
-
         }
 
         [HttpPost("register")]
@@ -87,13 +71,11 @@ namespace PropertyManagement.Api.Controllers
 
             await _userManager.AddToRoleAsync(user, Roles.User);
 
-            var confirmationLink = await GenerateEmailConfirmationLinkAsync(user);
-
             try
             {
-                await _emailService.SendConfirmationEmailAsync(
-                    user.Email!,
-                    confirmationLink);
+                await _emailService.SendRegisterConfirmEmailAsync(
+                    user.Email,
+                    user);
             }
             catch (Exception ex)
             {
@@ -123,13 +105,11 @@ namespace PropertyManagement.Api.Controllers
             if (await _userManager.IsEmailConfirmedAsync(user))
                 return BadRequest("Email has already been confirmed.");
 
-            var confirmationLink = await GenerateEmailConfirmationLinkAsync(user);
-
             try
             {
-                await _emailService.SendConfirmationEmailAsync(
+                await _emailService.SendRegisterConfirmEmailAsync(
                     user.Email!,
-                    confirmationLink);
+                    user);
             }
             catch (Exception ex)
             {
@@ -224,11 +204,5 @@ namespace PropertyManagement.Api.Controllers
         // TODO Reset Password
 
         // TODO Change Password
-
-        // TODO Change Email
-
-        // TODO Change First Name
-
-        // TODO Change Last Name
     }
 }

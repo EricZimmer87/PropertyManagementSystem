@@ -172,9 +172,12 @@ namespace PropertyManagement.Api.Migrations
 
                     b.Property<string>("NormalizedEmail")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("AllowedEmailId");
+
+                    b.HasIndex("NormalizedEmail")
+                        .IsUnique();
 
                     b.ToTable("AllowedEmails");
                 });

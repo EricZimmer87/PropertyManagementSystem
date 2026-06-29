@@ -12,7 +12,7 @@ using PropertyManagement.Api.Data;
 namespace PropertyManagement.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260626213744_InitialCreate")]
+    [Migration("20260629220035_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -175,9 +175,12 @@ namespace PropertyManagement.Api.Migrations
 
                     b.Property<string>("NormalizedEmail")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("AllowedEmailId");
+
+                    b.HasIndex("NormalizedEmail")
+                        .IsUnique();
 
                     b.ToTable("AllowedEmails");
                 });
