@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using PropertyManagement.Api.Authentication;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Seeding;
@@ -64,6 +65,8 @@ builder.Services
 //        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
 //    });
 
+builder.Services.AddScoped<CookieValidationEvents>();
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     //options.AccessDeniedPath = "/Identity/Account/AccessDenied";
@@ -75,6 +78,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     //using Microsoft.AspNetCore.Authentication.Cookies;
     options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
     options.SlidingExpiration = true;
+
+    // Deny access if user's IsActive is false
+    options.EventsType = typeof(CookieValidationEvents);
 });
 
 // Add authorization services to dependency injection container

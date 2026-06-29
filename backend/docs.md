@@ -33,9 +33,14 @@
 
 # Controllers
 
+## BaseApiController
+
+- `IdentityValidationProblem` was adapted from ASP.NET Identity's `IdentityApiEndpointRouteBuilderExtensions` to convert `IdentityResult` errors into a `ValidationProblemDetails` response for more consistent error logging.
+
 ## Auth Controller
 
-`AuthController` handles authentication API end points. `CreateValidationProblem` was adapted from ASP.NET Identity's `IdentityApiEndpointRouteBuilderExtensions` to convert `IdentityResult` errors into a `ValidationProblemDetails` response for more consistent error logging.
+- `AuthController` handles authentication API end points.
+- Inherits from `BaseApiController` to use `IdentityValidationProblem`
 
 ### POST /register
 
@@ -44,5 +49,10 @@ Creates a new user account
 - Checks the `AllowedEmails` table before permitting user to create account
   - An allowed email can only be added/removed by admin account
 - A new `AppUser` is created upon success
+- Default `Role` is set to `User`
 - Sends email confirmation link
 - Email must be confirmed before login is permitted
+
+## Users Controller
+
+- Inherits from `BaseApiController` to use `IdentityValidationProblem`

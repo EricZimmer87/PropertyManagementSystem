@@ -6,14 +6,13 @@ using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.Auth;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services;
-using System.Diagnostics;
 using System.Net;
 
 namespace PropertyManagement.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseApiController
     {
         private readonly AppDbContext _context;
         private readonly IEmailService _emailService;
@@ -36,37 +35,6 @@ namespace PropertyManagement.Api.Controllers
             _userManager = userManager;
             _logger = logger;
             _signInManager = signInManager;
-        }
-
-        // Adapted from ASP.NET Core Identity's IdentityApiEndpointRouteBuilderExtensions.
-        // Converts IdentityResult errors into a ValidationProblemDetails response.
-        // https://github.com/dotnet/aspnetcore/blob/main/src/Identity/Core/src/IdentityApiEndpointRouteBuilderExtensions.cs
-        private ActionResult CreateValidationProblem(IdentityResult result)
-        {
-            // We expect a single error code and description in the normal case.
-            // This could be golfed with GroupBy and ToDictionary, but perf! :P
-            Debug.Assert(!result.Succeeded);
-            var errorDictionary = new Dictionary<string, string[]>(1);
-
-            foreach (var error in result.Errors)
-            {
-                string[] newDescriptions;
-
-                if (errorDictionary.TryGetValue(error.Code, out var descriptions))
-                {
-                    newDescriptions = new string[descriptions.Length + 1];
-                    Array.Copy(descriptions, newDescriptions, descriptions.Length);
-                    newDescriptions[descriptions.Length] = error.Description;
-                }
-                else
-                {
-                    newDescriptions = [error.Description];
-                }
-
-                errorDictionary[error.Code] = newDescriptions;
-            }
-
-            return ValidationProblem(new ValidationProblemDetails(errorDictionary));
         }
 
         private async Task<string> GenerateEmailConfirmationLinkAsync(AppUser user)
@@ -114,8 +82,10 @@ namespace PropertyManagement.Api.Controllers
 
             if (!result.Succeeded)
             {
-                return CreateValidationProblem(result);
+                return IdentityValidationProblem(result);
             }
+
+            await _userManager.AddToRoleAsync(user, Roles.User);
 
             var confirmationLink = await GenerateEmailConfirmationLinkAsync(user);
 
@@ -198,7 +168,7 @@ namespace PropertyManagement.Api.Controllers
             var result = await _userManager.ConfirmEmailAsync(user, token);
 
             if (!result.Succeeded)
-                return CreateValidationProblem(result);
+                return IdentityValidationProblem(result);
 
             return Ok(new
             {
@@ -260,26 +230,5 @@ namespace PropertyManagement.Api.Controllers
         // TODO Change First Name
 
         // TODO Change Last Name
-
-        // TODO Fix this to use User ID, not email, and put it in an AppUsersController
-        [Authorize(Roles = Roles.Admin)]
-        [HttpPut("users/{id}/active")]
-        public async Task<ActionResult> SetIsActive(IsActiveRequest request)
-        {
-            // Ensure user exists
-            var email = request.Email.Trim();
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-                return Unauthorized("Email or password is incorrect.");
-
-            user.IsActive = request.IsActive;
-
-            await _context.SaveChangesAsync();
-
-            return Ok(new
-            {
-                Message = $"{user.Email}'s active status has been set to {user.IsActive}."
-            });
-        }
     }
 }
