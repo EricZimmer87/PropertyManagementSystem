@@ -68,6 +68,11 @@ namespace PropertyManagement.Api.Controllers
             if (userRoles.Contains(Roles.Admin))
                 return BadRequest("Cannot deactivate admin users.");
 
+            // Admin cannot deactivate his/herself
+            var currentUserId = _userManager.GetUserId(User);
+            if (user.Id == currentUserId)
+                return BadRequest("You cannot deactivate your own account.");
+
             // No need to change IsActive if it is set to the same value
             if (user.IsActive == request.IsActive)
             {
