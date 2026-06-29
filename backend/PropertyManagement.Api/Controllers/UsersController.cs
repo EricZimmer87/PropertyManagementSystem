@@ -55,8 +55,8 @@ namespace PropertyManagement.Api.Controllers
             return Ok(response);
         }
 
-        // PUT /{id}/active - sets IsActive for user
-        [HttpPut("{id}/active")]
+        // PATCH /{id}/active - sets IsActive for user
+        [HttpPatch("{id}/active")]
         public async Task<ActionResult> SetIsActive(IsActiveRequest request, string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -109,6 +109,44 @@ namespace PropertyManagement.Api.Controllers
             });
         }
 
-        // TODO change a user's role
+        // PATCH /api/Users/update-role/{id}
+        [HttpPatch("update-role/{id}")]
+        public async Task<ActionResult<UserResponse>> UpdateUserRole(string id, UpdateUserRoleRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            var currentRoles = await _userManager.GetRolesAsync(user);
+
+            if (currentRoles.Any())
+            {
+                var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+
+                if (!removeResult.Succeeded)
+                    return IdentityValidationProblem(removeResult);
+            }
+
+            var addResult = await _userManager.AddToRoleAsync(user, request.Role);
+
+            if (!addResult.Succeeded)
+                return IdentityValidationProblem(addResult);
+
+            await _userManager.UpdateSecurityStampAsync(user);
+
+            var updatedRoles = await _userManager.GetRolesAsync(user);
+
+            var response = new UserResponse
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email ?? "",
+                IsActive = user.IsActive,
+                Role = updatedRoles.FirstOrDefault()
+            };
+
+            return Ok(response);
+        }
     }
 }
