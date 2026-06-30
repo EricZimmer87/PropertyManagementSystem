@@ -3,7 +3,7 @@ using PropertyManagement.Api.Models;
 using System.Net;
 using System.Net.Mail;
 
-namespace PropertyManagement.Api.Services
+namespace PropertyManagement.Api.Services.Email
 {
     public class EmailService : IEmailService
     {
@@ -87,6 +87,33 @@ namespace PropertyManagement.Api.Services
             await SendEmailAsync(
                 toEmail,
                 "Confirm your email address",
+                body);
+        }
+
+        public async Task SendPasswordResetLinkAsync(string email, AppUser user)
+        {
+            // Generate the secure reset token
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            // Encode token for safe URL transmission
+            var encodedToken = WebUtility.UrlEncode(token);
+
+            // Construct the reset link
+            // Change for correct front end later
+            var frontEndUrl = _configuration["AppSettings:FrontEndUrl"];
+            var resetLink =
+                $"{frontEndUrl}/auth/reset-password?userId={user.Id}&token={encodedToken}";
+
+            var body = $"""
+                Please reset your password by clicking here:
+                <a href='{resetLink}'>
+                Reset Password
+                <a/>
+                """;
+
+            await SendEmailAsync(
+                email,
+                "Reset Password",
                 body);
         }
     }

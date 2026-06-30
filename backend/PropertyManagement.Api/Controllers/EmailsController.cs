@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PropertyManagement.Api.Services;
+using PropertyManagement.Api.Services.Email;
 
 namespace PropertyManagement.Api.Controllers
 {

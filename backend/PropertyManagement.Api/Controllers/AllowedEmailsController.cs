@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.AllowedEmails;
 using PropertyManagement.Api.Models;
-using PropertyManagement.Api.Services;
+using PropertyManagement.Api.Services.Email;
 
 namespace PropertyManagement.Api.Controllers
 {

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.DTOs.AppUsers;
 using PropertyManagement.Api.DTOs.Users;
 using PropertyManagement.Api.Models;
-using PropertyManagement.Api.Services;
+using PropertyManagement.Api.Services.Email;
 
 namespace PropertyManagement.Api.Controllers
 {

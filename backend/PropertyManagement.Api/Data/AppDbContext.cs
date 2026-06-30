@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services;
+using PropertyManagement.Api.Services.Email;
 
 namespace PropertyManagement.Api.Data
 {
@@ -55,7 +56,6 @@ namespace PropertyManagement.Api.Data
                 .OnDelete(DeleteBehavior.NoAction);
         }
 
-        // Normalize guest phone numbers
         private void NormalizeGuestPhoneNumbers()
         {
             foreach (var entry in ChangeTracker.Entries<Guest>()
@@ -67,7 +67,6 @@ namespace PropertyManagement.Api.Data
             }
         }
 
-        // Normalized AllowedEmails
         private void NormalizeAllowedEmails()
         {
             foreach (var entry in ChangeTracker.Entries<AllowedEmail>()
@@ -80,6 +79,7 @@ namespace PropertyManagement.Api.Data
         }
 
         // Override SaveChanges() and SaveChangesAsync() to automatically normalize phone number of guest
+        // and allowed emails
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
             NormalizeGuestPhoneNumbers();

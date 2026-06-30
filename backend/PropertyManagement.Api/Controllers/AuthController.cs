@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.Auth;
 using PropertyManagement.Api.Models;
-using PropertyManagement.Api.Services;
+using PropertyManagement.Api.Services.Email;
 
 namespace PropertyManagement.Api.Controllers
 {
@@ -33,6 +33,7 @@ namespace PropertyManagement.Api.Controllers
             _signInManager = signInManager;
         }
 
+        // POST /api/Auth/register - registers a new user, if their email is allowed
         [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterUserRequest registration)
         {
@@ -94,6 +95,7 @@ namespace PropertyManagement.Api.Controllers
             });
         }
 
+        // POST /api/Auth/resend-confirmation/email - resends the confirmation email
         [HttpPost("resend-confirmation-email")]
         public async Task<ActionResult> ResendConfirmationEmail(ResendConfirmationEmailRequest request)
         {
@@ -125,6 +127,7 @@ namespace PropertyManagement.Api.Controllers
             return Ok("Please check your email to confirm your account.");
         }
 
+        // GET /api/Auth/confirm-email - confirms email address from the confirmation email link
         [HttpGet("confirm-email")]
         public async Task<ActionResult> ConfirmEmail(string userId, string token)
         {
@@ -156,6 +159,7 @@ namespace PropertyManagement.Api.Controllers
             });
         }
 
+        // POST /api/Auth/login - logs the user in
         [HttpPost]
         [Route("login")]
         public async Task<ActionResult> Login(LoginRequest request)
@@ -188,6 +192,7 @@ namespace PropertyManagement.Api.Controllers
             return NoContent();
         }
 
+        // DELETE /api/Auth/logout - logs the user out
         [Authorize]
         [HttpDelete("logout")]
         public async Task<ActionResult> Logout()
@@ -199,10 +204,70 @@ namespace PropertyManagement.Api.Controllers
             return NoContent();
         }
 
-        // TODO Forgot Password
+        // POST /api/Auth/forgot-password - sends a link to the email address to reset password
+        [HttpPost("forgot-password")]
+        public async Task<ActionResult> ForgotPassword(ForgotPasswordRequest request)
+        {
+            var requestEmail = request.Email.Trim();
+            // Check if the email even exists as a user
+            var user = await _userManager.FindByEmailAsync(requestEmail);
+            // User with the requested email does not exist, so just send that the email has been sent to not reveal
+            // whether there is a user by that email.
+            if (user == null) return Ok("Password reset link has been sent. Please check your email.");
 
-        // TODO Reset Password
+            try
+            {
+                await _emailService.SendPasswordResetLinkAsync(requestEmail, user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Failed to send password reset email to {Email}",
+                    requestEmail);
 
-        // TODO Change Password
+                return StatusCode(500,
+                    "We couldn't send the password reset email.");
+            }
+
+            return Ok("Password reset link has been sent. Please check your email.");
+        }
+
+        // POST /api/Auth/reset-password - resets the user's password
+        [HttpPost("reset-password")]
+        public async Task<ActionResult> ResetPassword(ResetPasswordRequest request)
+        {
+            var requestEmail = request.Email.Trim();
+            var user = await _userManager.FindByEmailAsync(requestEmail);
+            if (user == null) return BadRequest("Unable to reset password.");
+
+            var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+
+            if (!result.Succeeded)
+                return IdentityValidationProblem(result);
+
+            return Ok(new
+            {
+                Message = "Password has been reset successfully."
+            });
+        }
+
+        // POST /api/Auth/change-password - change user's password
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<ActionResult> ChangePassword(ChangePasswordRequest request)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            var result = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
+
+            if (!result.Succeeded)
+                return IdentityValidationProblem(result);
+
+            return Ok(new
+            {
+                Message = "Password has successfully been changed."
+            });
+        }
     }
 }

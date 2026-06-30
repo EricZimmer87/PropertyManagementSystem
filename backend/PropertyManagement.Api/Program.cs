@@ -5,7 +5,7 @@ using PropertyManagement.Api.Authentication;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Seeding;
-using PropertyManagement.Api.Services;
+using PropertyManagement.Api.Services.Email;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);

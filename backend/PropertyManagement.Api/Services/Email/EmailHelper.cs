@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace PropertyManagement.Api.Services
+namespace PropertyManagement.Api.Services.Email
 {
     public static class EmailHelper
     {
