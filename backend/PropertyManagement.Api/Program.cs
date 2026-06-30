@@ -49,7 +49,7 @@ builder.Services
         // User
         options.User.AllowedUserNameCharacters =
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-        options.User.RequireUniqueEmail = false;
+        options.User.RequireUniqueEmail = true;
 
         // Change to true after setting up email provider
         options.SignIn.RequireConfirmedAccount = true;
@@ -58,14 +58,15 @@ builder.Services
     .AddDefaultTokenProviders();
 
 // For Google OAuth
-//builder.Services.AddAuthentication()
-//    .AddGoogle(options =>
-//    {
-//        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
-//        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
-//    });
+builder.Services.AddAuthentication()
+    .AddGoogleOpenIdConnect(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:GoogleOpenIdConnect:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:GoogleOpenIdConnect:ClientSecret"];
 
-builder.Services.AddScoped<CookieValidationEvents>();
+        // Use cookies
+        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    });
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -82,6 +83,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     // Deny access if user's IsActive is false
     options.EventsType = typeof(CookieValidationEvents);
 });
+
+builder.Services.AddScoped<CookieValidationEvents>();
 
 // Add authorization services to dependency injection container
 builder.Services.AddAuthorization();

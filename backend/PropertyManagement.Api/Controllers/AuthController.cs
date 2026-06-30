@@ -269,5 +269,45 @@ namespace PropertyManagement.Api.Controllers
                 Message = "Password has successfully been changed."
             });
         }
+
+        /*
+         * Google OAuth
+         */
+
+        [AllowAnonymous]
+        [HttpGet("signin-google")]
+        public IActionResult SignInGoogle(string? returnUrl = "/")
+        {
+            var redirectUrl = Url.Action(nameof(GoogleCallback));
+
+            var properties =
+                _signInManager.ConfigureExternalAuthenticationProperties(
+                    "Google",
+                    redirectUrl!);
+
+            return Challenge(properties, "Google");
+        }
+
+        [AllowAnonymous]
+        [HttpGet("google-signin-callback")]
+        public async Task<IActionResult> GoogleCallback()
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+
+            if (info == null)
+                return BadRequest();
+
+            // Existing Google login?
+            var result = await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider,
+                info.ProviderKey,
+                isPersistent: false);
+
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
     }
 }
