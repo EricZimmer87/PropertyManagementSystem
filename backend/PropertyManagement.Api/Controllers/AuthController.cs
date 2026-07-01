@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Google.Apis.Auth.AspNetCore3;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.Auth;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services.Email;
+using System.Security.Claims;
 
 namespace PropertyManagement.Api.Controllers
 {
@@ -276,16 +278,16 @@ namespace PropertyManagement.Api.Controllers
 
         [AllowAnonymous]
         [HttpGet("signin-google")]
-        public IActionResult SignInGoogle(string? returnUrl = "/")
+        public IActionResult SignInGoogle()
         {
-            var redirectUrl = Url.Action(nameof(GoogleCallback));
+            var redirectUrl = Url.Action(nameof(GoogleCallback), "Auth");
 
-            var properties =
-                _signInManager.ConfigureExternalAuthenticationProperties(
-                    "Google",
-                    redirectUrl!);
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(
+                GoogleOpenIdConnectDefaults.AuthenticationScheme,
+                redirectUrl);
 
-            return Challenge(properties, "Google");
+            // This returns a ChallengeResult, redirecting the user to Google's login page
+            return Challenge(properties, GoogleOpenIdConnectDefaults.AuthenticationScheme);
         }
 
         [AllowAnonymous]
@@ -296,6 +298,14 @@ namespace PropertyManagement.Api.Controllers
 
             if (info == null)
                 return BadRequest();
+
+            // Is this where I add my business logic for checking if the user is allowed to log in with Google? For example, checking if the email is in the AllowedEmails table.
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+
+            var allowed = await _context.AllowedEmails
+                .AnyAsync(a => a.NormalizedEmail == _userManager.NormalizeEmail(email));
+
+            if (!allowed) return BadRequest("You shall not pass!");
 
             // Existing Google login?
             var result = await _signInManager.ExternalLoginSignInAsync(

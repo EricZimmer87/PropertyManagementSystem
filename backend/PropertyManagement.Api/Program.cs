@@ -58,14 +58,15 @@ builder.Services
     .AddDefaultTokenProviders();
 
 // For Google OAuth
-builder.Services.AddAuthentication()
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
     .AddGoogleOpenIdConnect(options =>
     {
         options.ClientId = builder.Configuration["Authentication:GoogleOpenIdConnect:ClientId"];
         options.ClientSecret = builder.Configuration["Authentication:GoogleOpenIdConnect:ClientSecret"];
-
-        // Use cookies
-        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     });
 
 builder.Services.ConfigureApplicationCookie(options =>
