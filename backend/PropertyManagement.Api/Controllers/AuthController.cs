@@ -72,7 +72,12 @@ namespace PropertyManagement.Api.Controllers
                 return IdentityValidationProblem(result);
             }
 
-            await _userManager.AddToRoleAsync(user, Roles.User);
+            // Set default role to user
+            var roleResult = await _userManager.AddToRoleAsync(user, Roles.User);
+            if (!roleResult.Succeeded)
+            {
+                return IdentityValidationProblem(roleResult);
+            }
 
             try
             {
@@ -299,25 +304,77 @@ namespace PropertyManagement.Api.Controllers
             if (info == null)
                 return BadRequest();
 
-            // Is this where I add my business logic for checking if the user is allowed to log in with Google? For example, checking if the email is in the AllowedEmails table.
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrWhiteSpace(email)) return BadRequest("External authentication failed.");
 
+            // Check AllowedEmails table
+            var normalizedEmail = _userManager.NormalizeEmail(email);
             var allowed = await _context.AllowedEmails
-                .AnyAsync(a => a.NormalizedEmail == _userManager.NormalizeEmail(email));
+                .AnyAsync(a => a.NormalizedEmail == normalizedEmail);
+            if (!allowed) return StatusCode(StatusCodes.Status403Forbidden);
 
-            if (!allowed) return BadRequest("You shall not pass!");
+            // Check IsActive status if returning user
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user != null && !user.IsActive)
+            {
+                return Problem(
+                    title: "Account inactive",
+                    detail: "Your account has been deactivated.",
+                    statusCode: StatusCodes.Status403Forbidden);
+            }
 
-            // Existing Google login?
-            var result = await _signInManager.ExternalLoginSignInAsync(
-                info.LoginProvider,
+            // If user is on AllowedEmails table and IsActive, they can sign in
+            // Is this first time logging in?
+            if (user == null)
+            {
+                var firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);
+                var lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);
+
+                // Create user
+                user = new AppUser
+                {
+                    UserName = email,
+                    Email = email,
+                    EmailConfirmed = true, // no need to confirm email since Google already does it
+                    FirstName = firstName ?? "",
+                    LastName = lastName ?? ""
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    return IdentityValidationProblem(createResult);
+                }
+
+                // Set default role to user
+                var roleResult = await _userManager.AddToRoleAsync(user, Roles.User);
+                if (!roleResult.Succeeded)
+                    return IdentityValidationProblem(roleResult);
+            }
+
+            // If this Google account has already been linked to an Identity user,
+            // sign them in immediately.
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(
+            info.LoginProvider,
                 info.ProviderKey,
                 isPersistent: false);
 
-            if (result.Succeeded)
+            if (signInResult.Succeeded)
             {
                 return Ok();
             }
-            return BadRequest();
+
+            // First Google login
+            var addLoginResult = await _userManager.AddLoginAsync(user, info);
+
+            if (!addLoginResult.Succeeded)
+            {
+                return IdentityValidationProblem(addLoginResult);
+            }
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            return Ok();
         }
     }
 }

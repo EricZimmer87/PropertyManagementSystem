@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.AppUsers;
 using PropertyManagement.Api.DTOs.Users;
 using PropertyManagement.Api.Models;
@@ -17,14 +18,17 @@ namespace PropertyManagement.Api.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IEmailService _emailService;
         private readonly ILogger<AuthController> _logger;
+        private readonly AppDbContext _context;
 
         public UsersController(UserManager<AppUser> userManager,
             IEmailService emailService,
-            ILogger<AuthController> logger)
+            ILogger<AuthController> logger,
+            AppDbContext context)
         {
             _userManager = userManager;
             _emailService = emailService;
             _logger = logger;
+            _context = context;
         }
 
         // GET /users - gets all users
@@ -110,16 +114,50 @@ namespace PropertyManagement.Api.Controllers
             if (user == null)
                 return NotFound();
 
-            var result = await _userManager.DeleteAsync(user);
+            // Admin cannot delete his/herself
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+                return Unauthorized();
 
-            if (!result.Succeeded)
-                return IdentityValidationProblem(result);
+            if (currentUser.Id == user.Id)
+                return BadRequest("You cannot delete your own account.");
 
-            return Ok(new
+            // Deleting a user also removes their email from AllowedEmails so they
+            // cannot recreate their account by signing in again, with it set to active by default.
+            var normalizedEmail = _userManager.NormalizeEmail(user.Email);
+
+            var allowedEmail = await _context.AllowedEmails
+                .SingleOrDefaultAsync(a => a.NormalizedEmail == normalizedEmail);
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                Message = $"{user.FirstName} {user.LastName} ({user.Email}) has been deleted."
-            });
+                var result = await _userManager.DeleteAsync(user);
+
+                if (!result.Succeeded)
+                    return IdentityValidationProblem(result);
+
+                if (allowedEmail != null)
+                {
+                    _context.AllowedEmails.Remove(allowedEmail);
+                    await _context.SaveChangesAsync();
+                }
+
+                await transaction.CommitAsync();
+
+                return Ok(new
+                {
+                    Message = $"{user.FirstName} {user.LastName} ({user.Email}) has been deleted."
+                });
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
+
 
         // PATCH /api/Users/{id}/role - updates user's role
         [Authorize(Roles = Roles.Admin)]
