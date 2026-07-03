@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
+using PropertyManagement.Api.DTOs.AllowedEmails;
 using PropertyManagement.Api.DTOs.AppUsers;
+using PropertyManagement.Api.DTOs.Shared;
 using PropertyManagement.Api.DTOs.Users;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services.Email;
@@ -34,14 +36,30 @@ namespace PropertyManagement.Api.Controllers
         // GET /api/users - gets all users
         [Authorize(Roles = Roles.Admin)]
         [HttpGet]
-        public async Task<ActionResult<List<UserResponse>>> GetUsers()
+        public async Task<ActionResult<List<UserResponse>>> GetUsers(int pageNumber = 1, int pageSize = 10)
         {
-            List<UserResponse> response = await (
+            // pageNumber and pageSize must be greater than 0
+            if (pageNumber <= 0)
+                return BadRequest($"{nameof(pageNumber)} must be greater than 0.");
+            if (pageSize <= 0)
+                return BadRequest($"{nameof(pageSize)} must be greater than 0.");
+
+            // Counts all users, even those without roles, which should be none
+            var totalUsers = await _context.Users.CountAsync();
+
+            int skip = (pageNumber - 1) * pageSize;
+
+            // Users can only have one role - otherwise, change this query
+            var userResponses = await (
                 from u in _context.Users
                 .AsNoTracking()
                 join ur in _context.UserRoles on u.Id equals ur.UserId
                 join r in _context.Roles on ur.RoleId equals r.Id
-                orderby r.Name, u.IsActive descending, u.LastName, u.FirstName
+                orderby
+                    (r.Name == Roles.Admin ? 0 : 1),  // Admin first
+                    u.IsActive descending,
+                    u.LastName,
+                    u.FirstName
                 select new UserResponse
                 {
                     Id = u.Id,
@@ -49,9 +67,25 @@ namespace PropertyManagement.Api.Controllers
                     LastName = u.LastName,
                     Email = u.Email ?? "",
                     IsActive = u.IsActive,
-                    Role = r.Name // Each user only has one role
-                })
-                .ToListAsync();
+                    Role = r.Name
+                }
+            )
+            .Skip(skip)
+            .Take(pageSize)
+            .ToListAsync();
+
+            var totalPages = (int)Math.Ceiling(totalUsers / (double)pageSize);
+
+            var response = new PagedResponse<UserResponse>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalUsers,
+                TotalPages = totalPages,
+                HasNextPage = pageNumber < totalPages,
+                HasPreviousPage = pageNumber > 1,
+                Items = userResponses
+            };
 
             return Ok(response);
         }

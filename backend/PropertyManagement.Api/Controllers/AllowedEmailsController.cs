@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.AllowedEmails;
+using PropertyManagement.Api.DTOs.Shared;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services.Email;
+using System.Security.Claims;
 
 namespace PropertyManagement.Api.Controllers
 {
@@ -41,13 +43,27 @@ namespace PropertyManagement.Api.Controllers
             return Ok(response);
         }
 
-        // TODO Add pagination
         // GET /api/allowed-emails - get all allowed emails
         [HttpGet]
-        public async Task<ActionResult<List<AllowedEmailResponse>>> GetAllowedEmails()
+        public async Task<ActionResult<List<AllowedEmailResponse>>> GetAllowedEmails(int pageNumber = 1, int pageSize = 10)
         {
-            var emails = await _context.AllowedEmails
-                .AsNoTracking()
+            // pageNumber and pageSize must be greater than 0
+            if (pageNumber <= 0)
+                return BadRequest($"{nameof(pageNumber)} must be greater than 0.");
+            if (pageSize <= 0)
+                return BadRequest($"{nameof(pageSize)} must be greater than 0.");
+
+            // Start query
+            IQueryable<AllowedEmail> query = _context.AllowedEmails.AsNoTracking();
+
+            // Get total tickets count
+            var totalEmails = await query.CountAsync();
+
+            // Finish query, project into responses
+            var emailResponses = await query
+                .OrderBy(e => e.AllowedEmailId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .Select(e => new AllowedEmailResponse
                 {
                     AllowedEmailId = e.AllowedEmailId,
@@ -56,7 +72,20 @@ namespace PropertyManagement.Api.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(emails);
+            var totalPages = (int)Math.Ceiling(totalEmails / (double)pageSize);
+
+            var response = new PagedResponse<AllowedEmailResponse>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalEmails,
+                TotalPages = totalPages,
+                HasNextPage = pageNumber < totalPages,
+                HasPreviousPage = pageNumber > 1,
+                Items = emailResponses
+            };
+
+            return Ok(response);
         }
 
         // POST /api/allowed-emails/add - create a new allowed email

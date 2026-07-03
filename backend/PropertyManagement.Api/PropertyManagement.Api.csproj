@@ -23,10 +23,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.OpenApi" Version="2.9.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
     <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
     <PackageReference Include="NuGet.Protocol" Version="7.6.0" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.16.5" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.16.10" />
   </ItemGroup>
 
 </Project>
