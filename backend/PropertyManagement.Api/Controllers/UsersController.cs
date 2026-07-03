@@ -44,12 +44,13 @@ namespace PropertyManagement.Api.Controllers
             if (pageSize <= 0)
                 return BadRequest($"{nameof(pageSize)} must be greater than 0.");
 
-            // Counts all users, even those without roles, which should be none
+            // Users can have only one role, and default is to set to "User" when registering.
+            // Users will have one and only one role.
+            // If that changes, so must this query.
             var totalUsers = await _context.Users.CountAsync();
 
             int skip = (pageNumber - 1) * pageSize;
 
-            // Users can only have one role - otherwise, change this query
             var userResponses = await (
                 from u in _context.Users
                 .AsNoTracking()
