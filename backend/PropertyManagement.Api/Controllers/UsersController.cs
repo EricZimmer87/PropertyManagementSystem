@@ -10,7 +10,7 @@ using PropertyManagement.Api.Services.Email;
 
 namespace PropertyManagement.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     [Authorize]
     public class UsersController : BaseApiController
@@ -31,40 +31,32 @@ namespace PropertyManagement.Api.Controllers
             _context = context;
         }
 
-        // GET /users - gets all users
+        // GET /api/users - gets all users
         [Authorize(Roles = Roles.Admin)]
         [HttpGet]
         public async Task<ActionResult<List<UserResponse>>> GetUsers()
         {
-            var users = await _userManager
-                .Users
+            List<UserResponse> response = await (
+                from u in _context.Users
                 .AsNoTracking()
-                .OrderByDescending(u => u.IsActive)
-                .ThenBy(u => u.LastName)
-                .ThenBy(u => u.FirstName)
-                .ToListAsync();
-
-            var response = new List<UserResponse>();
-
-            foreach (var user in users)
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-
-                response.Add(new UserResponse
+                join ur in _context.UserRoles on u.Id equals ur.UserId
+                join r in _context.Roles on ur.RoleId equals r.Id
+                orderby r.Name, u.IsActive descending, u.LastName, u.FirstName
+                select new UserResponse
                 {
-                    Id = user.Id,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email ?? "",
-                    IsActive = user.IsActive,
-                    Role = roles.FirstOrDefault()
-                });
-            }
+                    Id = u.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Email = u.Email ?? "",
+                    IsActive = u.IsActive,
+                    Role = r.Name // Each user only has one role
+                })
+                .ToListAsync();
 
             return Ok(response);
         }
 
-        // PATCH /{id}/active - sets IsActive for user
+        // PATCH /api/users/{id}/active - sets IsActive for user
         [Authorize(Roles = Roles.Admin)]
         [HttpPatch("{id}/active")]
         public async Task<ActionResult> SetIsActive(IsActiveRequest request, string id)
@@ -105,7 +97,7 @@ namespace PropertyManagement.Api.Controllers
             });
         }
 
-        // DELETE /{id} - deletes a user
+        // DELETE /api/users/{id} - deletes a user
         [Authorize(Roles = Roles.Admin)]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUser(string id)
@@ -159,7 +151,7 @@ namespace PropertyManagement.Api.Controllers
         }
 
 
-        // PATCH /api/Users/{id}/role - updates user's role
+        // PATCH /api/users/{id}/role - updates user's role
         [Authorize(Roles = Roles.Admin)]
         [HttpPatch("{id}/role")]
         public async Task<ActionResult<UserResponse>> UpdateUserRole(string id, UpdateUserRoleRequest request)
@@ -201,7 +193,7 @@ namespace PropertyManagement.Api.Controllers
             return Ok(response);
         }
 
-        // PATCH /api/Users/{id}/name - updates first and last name
+        // PATCH /api/users/{id}/name - updates first and last name
         [Authorize]
         [HttpPatch("{id}/name")]
         public async Task<ActionResult<UserResponse>> UpdateFirstLastName(string id, UpdateFirstLastNameRequest request)
@@ -242,7 +234,7 @@ namespace PropertyManagement.Api.Controllers
             return Ok(response);
         }
 
-        // POST /api/Users/{id}/change-email - updates user's email
+        // POST /api/users/{id}/change-email - updates user's email
         [Authorize]
         [HttpPost("{id}/change-email")]
         public async Task<ActionResult> UpdateEmail(string id, UpdateEmailRequest request)
@@ -296,7 +288,7 @@ namespace PropertyManagement.Api.Controllers
             return Ok("Please check your email to confirm your email address.");
         }
 
-        // GET /api/Users/change-email-confirm - confirms the new email and updates email and user name
+        // GET /api/users/change-email-confirm - confirms the new email and updates email and user name
         [HttpGet("change-email-confirm")]
         public async Task<ActionResult> ConfirmChangeEmail(string newEmail, string userId, string token)
         {

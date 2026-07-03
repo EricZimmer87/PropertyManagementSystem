@@ -11,7 +11,7 @@ using System.Security.Claims;
 
 namespace PropertyManagement.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthController : BaseApiController
     {
@@ -35,7 +35,7 @@ namespace PropertyManagement.Api.Controllers
             _signInManager = signInManager;
         }
 
-        // POST /api/Auth/register - registers a new user, if their email is allowed
+        // POST /api/auth/register - registers a new user, if their email is allowed
         [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterUserRequest registration)
         {
@@ -102,7 +102,7 @@ namespace PropertyManagement.Api.Controllers
             });
         }
 
-        // POST /api/Auth/resend-confirmation/email - resends the confirmation email
+        // POST /api/auth/resend-confirmation/email - resends the confirmation email
         [HttpPost("resend-confirmation-email")]
         public async Task<ActionResult> ResendConfirmationEmail(ResendConfirmationEmailRequest request)
         {
@@ -134,7 +134,7 @@ namespace PropertyManagement.Api.Controllers
             return Ok("Please check your email to confirm your account.");
         }
 
-        // GET /api/Auth/confirm-email - confirms email address from the confirmation email link
+        // GET /api/auth/confirm-email - confirms email address from the confirmation email link
         [HttpGet("confirm-email")]
         public async Task<ActionResult> ConfirmEmail(string userId, string token)
         {
@@ -166,7 +166,7 @@ namespace PropertyManagement.Api.Controllers
             });
         }
 
-        // POST /api/Auth/login - logs the user in
+        // POST /api/auth/login - logs the user in
         [HttpPost]
         [Route("login")]
         public async Task<ActionResult> Login(LoginRequest request)
@@ -199,7 +199,7 @@ namespace PropertyManagement.Api.Controllers
             return NoContent();
         }
 
-        // DELETE /api/Auth/logout - logs the user out
+        // DELETE /api/auth/logout - logs the user out
         [Authorize]
         [HttpDelete("logout")]
         public async Task<ActionResult> Logout()
@@ -211,7 +211,7 @@ namespace PropertyManagement.Api.Controllers
             return NoContent();
         }
 
-        // POST /api/Auth/forgot-password - sends a link to the email address to reset password
+        // POST /api/auth/forgot-password - sends a link to the email address to reset password
         [HttpPost("forgot-password")]
         public async Task<ActionResult> ForgotPassword(ForgotPasswordRequest request)
         {
@@ -239,7 +239,7 @@ namespace PropertyManagement.Api.Controllers
             return Ok("Password reset link has been sent. Please check your email.");
         }
 
-        // POST /api/Auth/reset-password - resets the user's password
+        // POST /api/auth/reset-password - resets the user's password
         [HttpPost("reset-password")]
         public async Task<ActionResult> ResetPassword(ResetPasswordRequest request)
         {
@@ -258,7 +258,7 @@ namespace PropertyManagement.Api.Controllers
             });
         }
 
-        // POST /api/Auth/change-password - change user's password
+        // POST /api/auth/change-password - change user's password
         [Authorize]
         [HttpPost("change-password")]
         public async Task<ActionResult> ChangePassword(ChangePasswordRequest request)
@@ -281,6 +281,7 @@ namespace PropertyManagement.Api.Controllers
          * Google OAuth
          */
 
+        // GET /api/auth/signin-google - redirects user to Google login page
         [AllowAnonymous]
         [HttpGet("signin-google")]
         public IActionResult SignInGoogle()
@@ -295,6 +296,7 @@ namespace PropertyManagement.Api.Controllers
             return Challenge(properties, GoogleOpenIdConnectDefaults.AuthenticationScheme);
         }
 
+        // GET /api/auth/google-signin-callback - handles the callback from Google after user signs in
         [AllowAnonymous]
         [HttpGet("google-signin-callback")]
         public async Task<IActionResult> GoogleCallback()

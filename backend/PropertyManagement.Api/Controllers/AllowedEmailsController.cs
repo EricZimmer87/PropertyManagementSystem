@@ -8,7 +8,7 @@ using PropertyManagement.Api.Services.Email;
 
 namespace PropertyManagement.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/allowed-emails")]
     [ApiController]
     [Authorize(Roles = Roles.Admin)]
     public class AllowedEmailsController : ControllerBase
@@ -20,7 +20,7 @@ namespace PropertyManagement.Api.Controllers
             _context = context;
         }
 
-        // GET /api/AllowedEmails/{id} - get allowed email by id
+        // GET /api/allowed-emails/{id} - get allowed email by id
         [HttpGet("{id}")]
         public async Task<ActionResult<AllowedEmailResponse>> GetAllowedEmailById(long id)
         {
@@ -42,7 +42,7 @@ namespace PropertyManagement.Api.Controllers
         }
 
         // TODO Add pagination
-        // GET /api/AllowedEmails - get all allowed emails
+        // GET /api/allowed-emails - get all allowed emails
         [HttpGet]
         public async Task<ActionResult<List<AllowedEmailResponse>>> GetAllowedEmails()
         {
@@ -59,7 +59,7 @@ namespace PropertyManagement.Api.Controllers
             return Ok(emails);
         }
 
-        // POST /api/AllowedEmails/add - create a new allowed email
+        // POST /api/allowed-emails/add - create a new allowed email
         [HttpPost]
         public async Task<ActionResult<AllowedEmailResponse>> AddAllowedEmail(AddAllowedEmailRequest request)
         {
@@ -97,7 +97,7 @@ namespace PropertyManagement.Api.Controllers
                 response);
         }
 
-        // PATCH /api/AllowedEmails/{id} - update allowed email
+        // PATCH /api/allowed-emails/{id} - update allowed email
         [HttpPatch("{id}")]
         public async Task<ActionResult<AllowedEmailResponse>> UpdateAllowedEmail(UpdateAllowedEmailRequest request, long id)
         {
@@ -131,7 +131,7 @@ namespace PropertyManagement.Api.Controllers
             });
         }
 
-        // DELETE /api/AllowedEmails/{id} - delete allowed email
+        // DELETE /api/allowed-emails/{id} - delete allowed email
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAllowedEmail(long id)
         {

@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.Models;
 
 namespace PropertyManagement.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/guests")]
     [ApiController]
     public class GuestsController : ControllerBase
     {
@@ -17,6 +16,7 @@ namespace PropertyManagement.Api.Controllers
             _context = context;
         }
 
+        // GET /api/guests - gets all guests
         [HttpGet]
         public async Task<ActionResult<List<Guest>>> GetGuests()
         {
