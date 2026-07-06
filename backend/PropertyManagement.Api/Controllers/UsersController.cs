@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
-using PropertyManagement.Api.DTOs.AllowedEmails;
 using PropertyManagement.Api.DTOs.AppUsers;
 using PropertyManagement.Api.DTOs.Shared;
 using PropertyManagement.Api.DTOs.Users;
@@ -43,6 +42,8 @@ namespace PropertyManagement.Api.Controllers
                 return BadRequest($"{nameof(pageNumber)} must be greater than 0.");
             if (pageSize <= 0)
                 return BadRequest($"{nameof(pageSize)} must be greater than 0.");
+
+            pageSize = Math.Clamp(pageSize, 1, 100); // Limit pageSize to a maximum of 100
 
             // Users can have only one role, and default is to set to "User" when registering.
             // Users will have one and only one role.
