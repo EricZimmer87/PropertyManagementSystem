@@ -353,14 +353,12 @@ namespace PropertyManagement.Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedPhoneNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("State")
@@ -372,7 +370,8 @@ namespace PropertyManagement.Api.Migrations
                     b.HasKey("GuestId");
 
                     b.HasIndex("NormalizedPhoneNumber")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[NormalizedPhoneNumber] IS NOT NULL");
 
                     b.ToTable("Guests");
                 });

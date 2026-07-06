@@ -76,8 +76,8 @@ namespace PropertyManagement.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NormalizedPhoneNumber = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedPhoneNumber = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     State = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -339,7 +339,8 @@ namespace PropertyManagement.Api.Migrations
                 name: "IX_Guests_NormalizedPhoneNumber",
                 table: "Guests",
                 column: "NormalizedPhoneNumber",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedPhoneNumber] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Units_UnitNumber",
