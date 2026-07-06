@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PropertyManagement.Api.Common;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.AppUsers;
 using PropertyManagement.Api.DTOs.Shared;
@@ -35,26 +36,22 @@ namespace PropertyManagement.Api.Controllers
         // GET /api/users - gets all users
         [Authorize(Roles = Roles.Admin)]
         [HttpGet]
-        public async Task<ActionResult<List<UserResponse>>> GetUsers(int pageNumber = 1, int pageSize = 10)
+        public async Task<ActionResult<List<UserResponse>>> GetUsers([FromQuery] QueryFilter filter)
         {
-            // pageNumber and pageSize must be greater than 0
-            if (pageNumber <= 0)
-                return BadRequest($"{nameof(pageNumber)} must be greater than 0.");
-            if (pageSize <= 0)
-                return BadRequest($"{nameof(pageSize)} must be greater than 0.");
-
-            pageSize = Math.Clamp(pageSize, 1, 100); // Limit pageSize to a maximum of 100
+            var pageNumber = Math.Max(1, filter.PageNumber);
+            var pageSize = Math.Clamp(filter.PageSize, 1, 50);
 
             // Users can have only one role, and default is to set to "User" when registering.
             // Users will have one and only one role.
             // If that changes, so must this query.
-            var totalUsers = await _context.Users.CountAsync();
+            var query = _context.Users
+                .AsNoTracking()
+                .ApplySearch(filter.Search);
 
-            int skip = (pageNumber - 1) * pageSize;
+            var totalUsers = await query.CountAsync();
 
             var userResponses = await (
-                from u in _context.Users
-                .AsNoTracking()
+                from u in query
                 join ur in _context.UserRoles on u.Id equals ur.UserId
                 join r in _context.Roles on ur.RoleId equals r.Id
                 orderby
@@ -72,8 +69,7 @@ namespace PropertyManagement.Api.Controllers
                     Role = r.Name
                 }
             )
-            .Skip(skip)
-            .Take(pageSize)
+            .ApplyPagination(pageNumber, pageSize)
             .ToListAsync();
 
             var totalPages = (int)Math.Ceiling(totalUsers / (double)pageSize);

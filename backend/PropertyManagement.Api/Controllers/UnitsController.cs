@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PropertyManagement.Api.Common;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.Units;
 using PropertyManagement.Api.Models;
@@ -21,37 +22,11 @@ namespace PropertyManagement.Api.Controllers
 
         // GET api/units - gets all units
         [HttpGet]
-        public async Task<ActionResult<List<UnitResponse>>> GetUnits(string? sort, string? dir)
+        public async Task<ActionResult<List<UnitResponse>>> GetUnits([FromQuery] QueryFilter filter)
         {
-            bool descending = string.Equals(dir, "desc", StringComparison.OrdinalIgnoreCase);
-
-            sort = sort?.ToLowerInvariant();
-
-            var query = _context.Units
-                .AsNoTracking();
-
-            query = sort switch
-            {
-                "id" => descending
-                ? query.OrderByDescending(u => u.UnitId)
-                : query.OrderBy(u => u.UnitId),
-
-                "number" => descending
-                ? query.OrderByDescending(u => u.UnitNumber)
-                : query.OrderBy(u => u.UnitNumber),
-
-                "type" => descending
-                ? query.OrderByDescending(u => u.UnitType)
-                : query.OrderBy(u => u.UnitType),
-
-                "notes" => descending
-                ? query.OrderByDescending(u => u.Notes)
-                : query.OrderBy(u => u.Notes),
-
-                _ => query.OrderBy(u => u.UnitId)
-            };
-
-            var units = await query
+            var units = await _context.Units
+                .AsNoTracking()
+                .ApplySort(filter.SortBy ?? "UnitNumber")
                 .Select(u => new UnitResponse
                 {
                     UnitId = u.UnitId,

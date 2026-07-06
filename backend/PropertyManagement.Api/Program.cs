@@ -6,6 +6,7 @@ using PropertyManagement.Api.Data;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Seeding;
 using PropertyManagement.Api.Services.Email;
+using PropertyManagement.Api.Services.Guests;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -88,6 +89,8 @@ builder.Services.AddAuthorization();
 
 // Add email service
 builder.Services.AddTransient<IEmailService, EmailService>();
+// Guest Service
+builder.Services.AddScoped<IGuestService, GuestService>();
 
 var app = builder.Build();
 

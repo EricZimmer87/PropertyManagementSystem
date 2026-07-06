@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.AllowedEmails;
 using PropertyManagement.Api.DTOs.Shared;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services.Email;
-using System.Security.Claims;
+using PropertyManagement.Api.Common;
+using QueryFilter = PropertyManagement.Api.Common.QueryFilter;
 
 namespace PropertyManagement.Api.Controllers
 {
@@ -45,47 +47,48 @@ namespace PropertyManagement.Api.Controllers
 
         // GET /api/allowed-emails - get all allowed emails
         [HttpGet]
-        public async Task<ActionResult<List<AllowedEmailResponse>>> GetAllowedEmails(int pageNumber = 1, int pageSize = 10)
+        public async Task<ActionResult<PagedResponse<AllowedEmailResponse>>> GetAllowedEmails([FromQuery] QueryFilter filter,
+            CancellationToken cancellationToken)
         {
-            // pageNumber and pageSize must be greater than 0
-            if (pageNumber <= 0)
-                return BadRequest($"{nameof(pageNumber)} must be greater than 0.");
-            if (pageSize <= 0)
-                return BadRequest($"{nameof(pageSize)} must be greater than 0.");
+            var pageNumber = Math.Max(1, filter.PageNumber);
+            var pageSize = Math.Clamp(filter.PageSize, 1, 50);
 
-            // Start query
-            IQueryable<AllowedEmail> query = _context.AllowedEmails.AsNoTracking();
+            var query = _context.AllowedEmails
+                .AsNoTracking();
 
-            // Get total tickets count
-            var totalEmails = await query.CountAsync();
+            // Search
+            query = query.ApplySearch(filter.Search);
 
-            // Finish query, project into responses
-            var emailResponses = await query
-                .OrderBy(e => e.AllowedEmailId)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+            // Count total records after filter, before pagination
+            var totalRecords = await query.CountAsync(cancellationToken);
+
+            query = query.ApplySort(string.IsNullOrWhiteSpace(filter.SortBy)
+                    ? "CreatedAt"
+                    : filter.SortBy);
+
+            // Apply pagination and project to DTO
+            var allowedEmails = await query
+                .ApplyPagination(pageNumber, pageSize)
                 .Select(e => new AllowedEmailResponse
                 {
                     AllowedEmailId = e.AllowedEmailId,
                     Email = e.Email,
                     CreatedAt = e.CreatedAt
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
-            var totalPages = (int)Math.Ceiling(totalEmails / (double)pageSize);
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
 
-            var response = new PagedResponse<AllowedEmailResponse>
+            return new PagedResponse<AllowedEmailResponse>
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                TotalCount = totalEmails,
+                TotalCount = totalRecords,
                 TotalPages = totalPages,
                 HasNextPage = pageNumber < totalPages,
                 HasPreviousPage = pageNumber > 1,
-                Items = emailResponses
+                Items = allowedEmails
             };
-
-            return Ok(response);
         }
 
         // POST /api/allowed-emails/add - create a new allowed email
