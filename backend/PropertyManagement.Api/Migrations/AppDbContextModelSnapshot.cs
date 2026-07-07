@@ -469,7 +469,7 @@ namespace PropertyManagement.Api.Migrations
                     b.HasOne("PropertyManagement.Api.Models.Guest", "Guest")
                         .WithMany("Bookings")
                         .HasForeignKey("GuestId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("PropertyManagement.Api.Models.AppUser", "ModifiedByUser")

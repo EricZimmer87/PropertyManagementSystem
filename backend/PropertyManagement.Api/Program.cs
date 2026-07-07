@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Authentication;
 using PropertyManagement.Api.Data;
+using PropertyManagement.Api.Handlers;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Seeding;
 using PropertyManagement.Api.Services.Email;
@@ -12,6 +13,19 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+// Exception Handling
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = ctx =>
+    {
+        ctx.ProblemDetails.Extensions["traceId"] = ctx.HttpContext.TraceIdentifier;
+        ctx.ProblemDetails.Extensions["timestamp"] = DateTime.UtcNow;
+        ctx.ProblemDetails.Instance = $"{ctx.HttpContext.Request.Method} {ctx.HttpContext.Request.Path}";
+    };
+});
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -52,7 +66,6 @@ builder.Services
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
         options.User.RequireUniqueEmail = true;
 
-        // Change to true after setting up email provider
         options.SignIn.RequireConfirmedAccount = true;
     })
     .AddEntityFrameworkStores<AppDbContext>()
@@ -93,6 +106,9 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IGuestService, GuestService>();
 
 var app = builder.Build();
+
+// Exception handling
+app.UseExceptionHandler();
 
 // Seed admin user
 using var scope = app.Services.CreateScope();

@@ -4,6 +4,7 @@
 - Default Identity settings configured in `Program.cs`
 - `AppUser` custom entity that extends `IdentityUser`
 - Custom auth endpoints for app-specific business rules
+- `CookieValidationEvents` includes `ValidatePrincipal` method to deny access if user's `IsActive' is set to false
 
 # Database
 
@@ -18,6 +19,17 @@
 - Database is populated with fields to provide sample data for development testing
 - Admin user should be configured in `production.appsettings.json` to provide initial admin user
 
+# Common
+
+## QueryFilter
+
+- Contains fields for search, sort, and pagination
+
+## QueryableExtensions
+
+- Contains extension methods to add to queries for sorting, searching, and pagination
+- Method overloading for custom search for each table/entity
+
 # Services
 
 ## Email
@@ -30,6 +42,10 @@
 ## PhoneNumberHelper
 
 - Normalizes phone numbers
+
+## Guest Service
+
+- Logic for getting all guests, including pagination, search, sort
 
 # Controllers
 

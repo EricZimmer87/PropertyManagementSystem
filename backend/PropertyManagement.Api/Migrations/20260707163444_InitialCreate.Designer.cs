@@ -12,7 +12,7 @@ using PropertyManagement.Api.Data;
 namespace PropertyManagement.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260706160126_InitialCreate")]
+    [Migration("20260707163444_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -472,7 +472,7 @@ namespace PropertyManagement.Api.Migrations
                     b.HasOne("PropertyManagement.Api.Models.Guest", "Guest")
                         .WithMany("Bookings")
                         .HasForeignKey("GuestId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("PropertyManagement.Api.Models.AppUser", "ModifiedByUser")

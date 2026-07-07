@@ -54,6 +54,13 @@ namespace PropertyManagement.Api.Data
                 .WithMany(x => x.CanceledBookings)
                 .HasForeignKey(x => x.CanceledByUserId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            // Cannot delete a guest if they have bookings to maintain historical records.
+            builder.Entity<Booking>()
+                .HasOne(x => x.Guest)
+                .WithMany(x => x.Bookings)
+                .HasForeignKey(x => x.GuestId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
 
         private void NormalizeGuestPhoneNumbers()

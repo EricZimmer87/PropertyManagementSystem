@@ -255,8 +255,7 @@ namespace PropertyManagement.Api.Migrations
                         name: "FK_Bookings_Guests_GuestId",
                         column: x => x.GuestId,
                         principalTable: "Guests",
-                        principalColumn: "GuestId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "GuestId");
                     table.ForeignKey(
                         name: "FK_Bookings_Units_UnitId",
                         column: x => x.UnitId,
