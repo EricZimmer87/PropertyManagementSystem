@@ -5,7 +5,6 @@ using PropertyManagement.Api.Common;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.Guests;
 using PropertyManagement.Api.DTOs.Shared;
-using PropertyManagement.Api.Exceptions;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services.Guests;
 
@@ -151,20 +150,20 @@ namespace PropertyManagement.Api.Controllers
         public async Task<ActionResult> DeleteGuest(long id)
         {
             var guest = await _context.Guests
-                .FirstOrDefaultAsync(g => g.GuestId == id)
-                ?? throw new NotFoundException("Guest", id);
+                .FirstOrDefaultAsync(g => g.GuestId == id);
+
+            if (guest == null) return NotFound();
 
             var cannotDelete = _context.Bookings
                 .Any(b => b.GuestId == id);
 
             if (cannotDelete)
-                throw new InvalidOperationException("Cannot delete guest with existing bookings.");
+                return Conflict("Cannot delete guest with existing bookings.");
 
             _context.Guests.Remove(guest);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
-
     }
 }

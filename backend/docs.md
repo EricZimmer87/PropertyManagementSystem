@@ -47,6 +47,10 @@
 
 - Logic for getting all guests, including pagination, search, sort
 
+## Booking Service
+
+- Logic for getting all bookings, including pagination, search, sort
+
 # Controllers
 
 ## BaseApiController
@@ -72,3 +76,13 @@ Creates a new user account
 ## Users Controller
 
 - Inherits from `BaseApiController` to use `IdentityValidationProblem`
+
+## Bookings Controller
+
+- Projecting to `BookingResponse` is located in `/Bookings/BookingProjections.cs` to reuse, since it is long
+
+# Exception Handling
+
+- Using `ExceptionHandler` and `ProblemDetails` to catch unexpected, global errors
+  - Essentially a `try` `catch` block around the request
+- `GlobalExceptionHandler` contains the logic for handling unexpected errors

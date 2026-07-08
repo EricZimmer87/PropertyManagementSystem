@@ -6,6 +6,7 @@ using PropertyManagement.Api.Data;
 using PropertyManagement.Api.Handlers;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Seeding;
+using PropertyManagement.Api.Services.Bookings;
 using PropertyManagement.Api.Services.Email;
 using PropertyManagement.Api.Services.Guests;
 using Scalar.AspNetCore;
@@ -24,7 +25,6 @@ builder.Services.AddProblemDetails(options =>
         ctx.ProblemDetails.Instance = $"{ctx.HttpContext.Request.Method} {ctx.HttpContext.Request.Path}";
     };
 });
-
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddControllers();
@@ -104,6 +104,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddTransient<IEmailService, EmailService>();
 // Guest Service
 builder.Services.AddScoped<IGuestService, GuestService>();
+// Booking Service
+builder.Services.AddScoped<IBookingService, BookingService>();
 
 var app = builder.Build();
 
