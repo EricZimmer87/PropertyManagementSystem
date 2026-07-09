@@ -6,6 +6,7 @@ using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.Guests;
 using PropertyManagement.Api.DTOs.Shared;
 using PropertyManagement.Api.Models;
+using PropertyManagement.Api.Services;
 using PropertyManagement.Api.Services.Guests;
 
 namespace PropertyManagement.Api.Controllers
@@ -66,6 +67,19 @@ namespace PropertyManagement.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<GuestResponse>> CreateGuest([FromBody] CreateGuestRequest request)
         {
+            // Can't create two guests with the same phone number
+            if (request.PhoneNumber != null)
+            {
+                var normalizedPhoneNumber = PhoneNumberHelper.Normalize(request.PhoneNumber.Trim());
+
+                bool cannotCreate = await _context.Guests
+                    .AsNoTracking()
+                    .AnyAsync(g => g.NormalizedPhoneNumber == normalizedPhoneNumber);
+
+                if (cannotCreate)
+                    return Conflict("A guest with that phone number already exists.");
+            }
+
             var guest = new Guest
             {
                 FirstName = request.FirstName.Trim(),
@@ -83,20 +97,24 @@ namespace PropertyManagement.Api.Controllers
             _context.Guests.Add(guest);
             await _context.SaveChangesAsync();
 
-            var response = new GuestResponse
-            {
-                GuestId = guest.GuestId,
-                FirstName = guest.FirstName,
-                LastName = guest.LastName,
-                PhoneNumber = guest.PhoneNumber,
-                Address = guest.Address,
-                City = guest.City,
-                State = guest.State,
-                ZipCode = guest.ZipCode,
-                Email = guest.Email,
-                Company = guest.Company,
-                Notes = guest.Notes
-            };
+            var response = await _context.Guests
+                .AsNoTracking()
+                .Where(g => g.GuestId == guest.GuestId)
+                .Select(g => new GuestResponse
+                {
+                    GuestId = g.GuestId,
+                    FirstName = g.FirstName,
+                    LastName = g.LastName,
+                    PhoneNumber = g.PhoneNumber,
+                    Address = g.Address,
+                    City = g.City,
+                    State = g.State,
+                    ZipCode = g.ZipCode,
+                    Email = g.Email,
+                    Company = g.Company,
+                    Notes = g.Notes
+                })
+                .SingleAsync();
 
             return CreatedAtAction(
                 nameof(GetGuestById),
@@ -113,6 +131,20 @@ namespace PropertyManagement.Api.Controllers
 
             if (guest == null)
                 return NotFound();
+
+            // Can't create two guests with the same phone number
+            if (request.PhoneNumber != null)
+            {
+                var normalizedPhoneNumber = PhoneNumberHelper.Normalize(request.PhoneNumber.Trim());
+
+                var exists = await _context.Guests
+                    .AsNoTracking()
+                    .AnyAsync(g => g.GuestId != guest.GuestId &&
+                        g.NormalizedPhoneNumber == normalizedPhoneNumber);
+
+                if (exists)
+                    return Conflict("A guest with that phone number already exists.");
+            }
 
             guest.FirstName = request.FirstName.Trim();
             guest.LastName = request.LastName.Trim();
@@ -154,8 +186,9 @@ namespace PropertyManagement.Api.Controllers
 
             if (guest == null) return NotFound();
 
-            var cannotDelete = _context.Bookings
-                .Any(b => b.GuestId == id);
+            bool cannotDelete = await _context.Bookings
+                .AsNoTracking()
+                .AnyAsync(b => b.GuestId == id);
 
             if (cannotDelete)
                 return Conflict("Cannot delete guest with existing bookings.");

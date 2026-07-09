@@ -1,4 +1,6 @@
-﻿namespace PropertyManagement.Api.DTOs.Bookings
+﻿using PropertyManagement.Api.Models;
+
+namespace PropertyManagement.Api.DTOs.Bookings
 {
     public class BookingResponse
     {
@@ -9,7 +11,7 @@
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
         public int? Occupants { get; set; }
-        public string Status { get; set; } = "Booked";
+        public BookingStatus Status { get; set; } = BookingStatus.Booked;
         public string? Notes { get; set; }
         public int? CardLastFour { get; set; }
 

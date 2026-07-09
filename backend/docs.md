@@ -62,6 +62,10 @@
 - `AuthController` handles authentication API end points.
 - Inherits from `BaseApiController` to use `IdentityValidationProblem`
 
+## Bookings Controller
+
+- Made so that `StartDate` can be the same as `EndDate` in the event of charging by the hour
+
 ### POST /register
 
 Creates a new user account

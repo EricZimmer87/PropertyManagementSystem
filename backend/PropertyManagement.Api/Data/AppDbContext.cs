@@ -35,7 +35,12 @@ namespace PropertyManagement.Api.Data
             // Guest normalized phone number must be unique
             builder.Entity<Guest>()
                 .HasIndex(g => g.NormalizedPhoneNumber)
-                .IsUnique();
+                .IsUnique(true);
+
+            // Store BookingStatus as string
+            builder.Entity<Booking>()
+                .Property(b => b.Status)
+                .HasConversion<string>();
 
             // Explicitly configure booking audit-user relationships without cascade delete.
             // Users cannot be deleted while referenced by bookings to keep historical records accurate.

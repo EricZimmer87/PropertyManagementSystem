@@ -183,12 +183,12 @@ namespace PropertyManagement.Api.Common
                 EF.Functions.Like(b.Guest.LastName, like) ||
                 EF.Functions.Like(b.Unit.UnitNumber, like) ||
                 EF.Functions.Like(b.CreatedByUser != null
-                        ? (b.CreatedByUser.FirstName == null || b.CreatedByUser.FirstName == ""
+                        ? (b.CreatedByUser.FirstName == null || b.CreatedByUser.FirstName == "" 
                            || b.CreatedByUser.LastName == null || b.CreatedByUser.LastName == ""
                               ? b.CreatedByUser.Email
                               : b.CreatedByUser.FirstName + " " + b.CreatedByUser.LastName)
                         : null, like) ||
-                EF.Functions.Like(b.Status, like) ||
+                EF.Functions.Like(b.Status.ToString(), like) ||
                 EF.Functions.Like(b.Notes, like) ||
                 EF.Functions.Like(b.Guest.Address, like) ||
                 EF.Functions.Like(b.Guest.City, like) ||
