@@ -65,7 +65,7 @@ namespace PropertyManagement.Api.Controllers
             if (user == null) return Forbid();
 
             // StartDate must be less than EndDate
-            // They can be equal for hourly rates
+            // The dates can be equal in case the business wants to charge hourly rates
             if (request.StartDate > request.EndDate)
                 return Conflict("End date must be greater than start date.");
 
