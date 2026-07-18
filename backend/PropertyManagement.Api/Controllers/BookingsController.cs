@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.Bookings;
 using PropertyManagement.Api.DTOs.Shared;
-using PropertyManagement.Api.DTOs.Units;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services.Bookings;
 using QueryFilter = PropertyManagement.Api.Common.QueryFilter;
@@ -163,7 +162,7 @@ namespace PropertyManagement.Api.Controllers
         {
             var day = selectedDay ?? DateOnly.FromDateTime(DateTime.Today);
 
-            /* Covnert this to LINQ Query
+            /* Convert this to LINQ Query
              SELECT u.UnitNumber,
 	            b.StartDate,
 	            b.EndDate,
@@ -176,36 +175,51 @@ namespace PropertyManagement.Api.Controllers
             ORDER BY u.UnitNumber;
              */
 
-            var bookings = from u in _context.Units
-                           join b in _context.Bookings
-                            on b.UnitId equals u.UnitId
+            var query = await (from u in _context.Units
+                               join b in _context.Bookings
+                                   on u.UnitId equals b.UnitId
+                                   into bookings
+                               from b in bookings
+                               .Where(b =>
+                                   b.StartDate <= day &&
+                                   b.EndDate > day)
+                                   .DefaultIfEmpty()
+                               join g in _context.Guests
+                                   on b.GuestId equals g.GuestId
+                                   into guests
+                               from g in guests.DefaultIfEmpty()
+                               orderby u.UnitNumber
+                               select new BookingsByDayResponse
+                               {
+                                    CreatedOn = b == null ? default : b.CreatedOn,
+                                    CreatedByUserName =
+                                        b == null || b.CreatedByUser == null
+                                            ? string.Empty
+                                            : (string.IsNullOrEmpty(b.CreatedByUser.FirstName) ||
+                                            string.IsNullOrEmpty(b.CreatedByUser.LastName))
+                                                ? b.CreatedByUser.Email
+                                                : b.CreatedByUser.FirstName + " " + b.CreatedByUser.LastName,
 
-            //// Get all units
-            //var units = await _context.Units
-            //    .AsNoTracking()
-            //    .OrderBy(u => u.UnitNumber)
-            //    .Select(u => new UnitResponse
-            //    {
-            //        UnitId = u.UnitId,
-            //        UnitNumber = u.UnitNumber,
-            //        UnitType = u.UnitType,
-            //        Notes = u.Notes ?? ""
-            //    })
-            //    .ToListAsync();
+                                    UnitNumber = u.UnitNumber,
 
-                           //// Get all bookings
-                           //var bookings = await _context.Bookings
-                           //    .AsNoTracking()
-                           //    .Where(b => b.StartDate <= day && b.EndDate > day)
-                           //    .Select(BookingProjections.ToBookingResponse)
-                           //    .ToListAsync();
+                                    GuestName = g == null ? "" : g.FirstName + " " + g.LastName,
+                                    Address = g == null ? "" : (g.Address ?? ""),
+                                    City = g == null ? "" : (g.City ?? ""),
+                                    State = g == null ? "" : (g.State ?? ""),
+                                    ZipCode = g == null ? "" : (g.ZipCode ?? ""),
+                                    PhoneNumber = g == null ? "" : (g.PhoneNumber ?? ""),
 
-                           //// Group bookings by unit into a dictionary - unitNumber:booking
-                           //var byUnit = bookings
-                           //    .GroupBy(b => b.UnitNumber)
-                           //    .ToDictionary(b => b.Key, b => b.ToList());
+                                    StartDate = b == null ? default : b.StartDate,
+                                    EndDate = b == null ? default : b.EndDate,
 
-            return Ok(byUnit);
+                                    Occupants = b == null ? default : b.Occupants,
+                                    Status = b == null ? default : b.Status,
+                                    Notes = b == null ? default : b.Notes,
+                                    CardLastFour = b == null ? default : b.CardLastFour
+                               })
+                               .ToListAsync();
+
+            return Ok(query);
         }
     }
 }
