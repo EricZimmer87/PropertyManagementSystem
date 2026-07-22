@@ -156,7 +156,7 @@ namespace PropertyManagement.Api.Controllers
             return NoContent();
         }
 
-        // GET /api/bookings/by-day
+        // GET /api/bookings/by-day - gets all units and all bookings for the selected day
         [HttpGet("by-day")]
         public async Task<ActionResult> GetBookingsByDay(DateOnly? selectedDay)
         {

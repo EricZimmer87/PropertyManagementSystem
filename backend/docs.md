@@ -4,7 +4,7 @@
 - Default Identity settings configured in `Program.cs`
 - `AppUser` custom entity that extends `IdentityUser`
 - Custom auth endpoints for app-specific business rules
-- `CookieValidationEvents` includes `ValidatePrincipal` method to deny access if user's `IsActive' is set to false
+- Google OAuth implemented with sign in and callback endpoints in `AuthController`
 
 # Database
 
@@ -19,17 +19,6 @@
 - Database is populated with fields to provide sample data for development testing
 - Admin user should be configured in `production.appsettings.json` to provide initial admin user
 
-# Common
-
-## QueryFilter
-
-- Contains fields for search, sort, and pagination
-
-## QueryableExtensions
-
-- Contains extension methods to add to queries for sorting, searching, and pagination
-- Method overloading for custom search for each table/entity
-
 # Services
 
 ## Email
@@ -43,14 +32,6 @@
 
 - Normalizes phone numbers
 
-## Guest Service
-
-- Logic for getting all guests, including pagination, search, sort
-
-## Booking Service
-
-- Logic for getting all bookings, including pagination, search, sort
-
 # Controllers
 
 ## BaseApiController
@@ -61,10 +42,6 @@
 
 - `AuthController` handles authentication API end points.
 - Inherits from `BaseApiController` to use `IdentityValidationProblem`
-
-## Bookings Controller
-
-- Made so that `StartDate` can be the same as `EndDate` in the event of charging by the hour
 
 ### POST /register
 
@@ -80,13 +57,3 @@ Creates a new user account
 ## Users Controller
 
 - Inherits from `BaseApiController` to use `IdentityValidationProblem`
-
-## Bookings Controller
-
-- Projecting to `BookingResponse` is located in `/Bookings/BookingProjections.cs` to reuse, since it is long
-
-# Exception Handling
-
-- Using `ExceptionHandler` and `ProblemDetails` to catch unexpected, global errors
-  - Essentially a `try` `catch` block around the request
-- `GlobalExceptionHandler` contains the logic for handling unexpected errors
