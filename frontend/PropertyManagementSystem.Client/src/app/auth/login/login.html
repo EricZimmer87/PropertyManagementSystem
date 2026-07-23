@@ -1,0 +1,19 @@
+<div>
+  <h2>Login</h2>
+
+  @if (errorMessage) {
+    <div class="error">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <form [formGroup]="loginForm" (submit)="submitLogin()">
+    <label for="email">Email:</label>
+    <input type="text" id="email" name="email" formControlName="email" required />
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" formControlName="password" required />
+
+    <button type="submit" [disabled]="loginForm.invalid">Login</button>
+  </form>
+</div>

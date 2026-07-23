@@ -31,6 +31,17 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Angular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    });
+});
+
 // Database connection string
 var connectionString =
     builder.Configuration.GetConnectionString("DefaultConnection")
