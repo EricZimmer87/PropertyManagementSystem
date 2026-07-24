@@ -38,7 +38,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:4200")
         .AllowAnyHeader()
-        .AllowAnyMethod();
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
 
@@ -122,6 +123,9 @@ var app = builder.Build();
 
 // Exception handling
 app.UseExceptionHandler();
+
+// Add CORS
+app.UseCors("Angular");
 
 // Seed admin user
 using var scope = app.Services.CreateScope();

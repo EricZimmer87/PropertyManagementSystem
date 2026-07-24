@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { LoginService } from './login.service';
 import { LoginRequest } from './login-request.interface';
 import { Router } from '@angular/router';
+import { AuthService } from '../../core/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +12,8 @@ import { Router } from '@angular/router';
 })
 export class Login {
   private router = inject(Router);
-  loginService = inject(LoginService);
+  private cd = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
 
   loginForm = new FormGroup({
     email: new FormControl(''),
@@ -21,19 +22,21 @@ export class Login {
 
   errorMessage: string | null = null;
 
-  async submitLogin() {
+  submitLogin() {
     this.errorMessage = null;
-
     const email = this.loginForm.value.email ?? '';
     const password = this.loginForm.value.password ?? '';
     const request: LoginRequest = { email, password };
 
-    try {
-      await this.loginService.submitLogin(request);
-      this.router.navigate(['/bookings-by-day']);
-    } catch (err: any) {
-      const msg = err?.error ?? 'Login failed';
-      this.errorMessage = msg;
-    }
+    this.authService.login(request).subscribe({
+      next: () => {
+        this.router.navigate(['/bookings-by-day']);
+      },
+      error: (err) => {
+        const msg = err?.error ?? 'Login failed';
+        this.errorMessage = msg;
+        this.cd.detectChanges();
+      },
+    });
   }
 }
