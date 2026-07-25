@@ -28,7 +28,7 @@ export class BookingsByDay {
         this.cd.detectChanges();
       },
       error: (err) => {
-        this.error = err?.error?.message ?? err?.message ?? 'An error occurred';
+        this.error = err.message || 'An error occurred';
         this.bookings = null;
         this.isLoading = false;
       },

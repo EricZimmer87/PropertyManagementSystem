@@ -33,8 +33,7 @@ export class Login {
         this.router.navigate(['/bookings-by-day']);
       },
       error: (err) => {
-        const msg = err?.error ?? 'Login failed';
-        this.errorMessage = msg;
+        this.errorMessage = err.message || 'Login failed.';
         this.cd.detectChanges();
       },
     });

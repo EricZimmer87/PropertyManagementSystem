@@ -1,6 +1,6 @@
 import {
   PlatformLocation
-} from "./chunk-4DXF75TX.js";
+} from "./chunk-UFTY6GOC.js";
 import {
   ApplicationRef,
   Attribute,
@@ -32,12 +32,9 @@ import {
   RendererStyleFlags2,
   RuntimeError,
   Service,
-  Subject,
   TemplateRef,
   Version,
   ViewContainerRef,
-  __spreadProps,
-  __spreadValues,
   booleanAttribute,
   createNgModule,
   findLocaleData,
@@ -65,7 +62,12 @@ import {
   ɵɵinject,
   ɵɵinjectAttribute,
   ɵɵstyleProp
-} from "./chunk-UM5EOBB6.js";
+} from "./chunk-7TJK32NK.js";
+import {
+  Subject,
+  __spreadProps,
+  __spreadValues
+} from "./chunk-PJVWDKLX.js";
 
 // node_modules/@angular/common/fesm2022/_location-chunk.mjs
 function joinWithSlash(start, end) {
@@ -4501,4 +4503,4 @@ export {
   PLATFORM_BROWSER_ID,
   ViewportScroller
 };
-//# sourceMappingURL=chunk-PXPSUEAV.js.map
+//# sourceMappingURL=chunk-GN22BJQF.js.map
