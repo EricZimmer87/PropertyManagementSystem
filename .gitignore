@@ -524,6 +524,7 @@ yarn-error.log
 
 # Miscellaneous
 /.angular/cache
+frontend/PropertyManagementSystem.Client/.angular/
 .sass-cache/
 /connect.lock
 /coverage
