@@ -1,4 +1,57 @@
 /* You can add global styles to this file, and also import other style files */
+html {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin-bottom: 100px;
+}
+
 .error {
   color: rgb(255, 0, 0);
+}
+
+/* Forms */
+form {
+  max-width: 400px;
+  margin: auto;
+  display: grid;
+  gap: 15px;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+  font-size: 1rem;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Buttons */
+
+.submit-button {
+  background: #0077cc;
+  color: #fff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.submit-button:hover {
+  background: #005fa3;
 }

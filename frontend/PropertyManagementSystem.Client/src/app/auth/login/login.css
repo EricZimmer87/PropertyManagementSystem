@@ -1,0 +1,8 @@
+.form-header {
+  text-align: center;
+}
+
+#google-login-button {
+  margin: 30px auto 0px auto;
+  display: grid;
+}
