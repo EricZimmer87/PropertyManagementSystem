@@ -1,13 +1,13 @@
 <div>
   <h2 class="form-header">Login</h2>
 
-  @if (errorMessage != null) {
-    <div class="error">
-      {{ errorMessage }}
-    </div>
-  }
-
   <form [formGroup]="loginForm" (submit)="submitLogin()">
+    @if (errorMessage != null) {
+      <div class="error">
+        {{ errorMessage }}
+      </div>
+    }
+
     <label for="email">Email:</label>
     <input type="text" id="email" name="email" formControlName="email" required />
 

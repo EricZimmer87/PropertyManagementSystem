@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { LoginRequest } from './login-request.interface';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { DOCUMENT } from '@angular/common';
@@ -18,13 +18,22 @@ export class Login {
   private authService = inject(AuthService);
   private http = inject(HttpClient);
   private document = inject(DOCUMENT);
+  private activatedRoute = inject(ActivatedRoute);
+
+  errorMessage: string | null = null;
+
+  ngOnInit() {
+    // If Google OAuth login fails, it redirects with a query parameter for the error
+    // Use this to display that error message on the login HTML page
+    this.activatedRoute.queryParams.subscribe((params) => {
+      this.errorMessage = params['error'];
+    });
+  }
 
   loginForm = new FormGroup({
     email: new FormControl(''),
     password: new FormControl(''),
   });
-
-  errorMessage: string | null = null;
 
   submitLogin() {
     this.errorMessage = null;
@@ -44,15 +53,20 @@ export class Login {
   }
 
   googleLoginSubmit() {
-    console.log('Google login clicked.');
-    var url = 'http://localhost:5093/api/auth/signin-google';
+    // Set where to return to after Google login
+    const returnUrl = this.router.url || '/bookings-by-day';
+    const url = `https://localhost:7016/api/auth/signin-google?returnUrl=${encodeURIComponent(returnUrl)}`;
 
-    this.http.get<{ authURL: string }>(url).subscribe({
-      next: (data) => {
-        // Redirect the entire browser to the Google OAuth URL
-        this.document.location.href = data.authURL;
-      },
-      error: (err) => console.error('OAuth redirect failed', err),
-    });
+    window.location.href = url;
+
+    // this.document.location.href = url;
+
+    // this.http.get<{ authURL: string }>(url).subscribe({
+    //   next: (data) => {
+    //     // Redirect the entire browser to the Google OAuth URL
+    //     this.document.location.href = data.authURL;
+    //   },
+    //   error: (err) => console.error('OAuth redirect failed', err),
+    // });
   }
 }

@@ -1,4 +1,5 @@
 ﻿using Google.Apis.Auth.AspNetCore3;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -284,13 +285,20 @@ namespace PropertyManagement.Api.Controllers
         // GET /api/auth/signin-google - redirects user to Google login page
         [AllowAnonymous]
         [HttpGet("signin-google")]
-        public IActionResult SignInGoogle()
+        public IActionResult SignInGoogle([FromQuery] string? returnUrl = null)
         {
+            returnUrl ??= "/bookings-by-day";
+
+            // Change in production
+            var angularBase = "http://localhost:4200";
+            var returnPath = returnUrl.StartsWith("/") ? returnUrl : "/" + returnUrl;
             var redirectUrl = Url.Action(nameof(GoogleCallback), "Auth");
 
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(
                 GoogleOpenIdConnectDefaults.AuthenticationScheme,
                 redirectUrl);
+
+            properties.Items["returnUrl"] = angularBase + returnPath;
 
             // This returns a ChallengeResult, redirecting the user to Google's login page
             return Challenge(properties, GoogleOpenIdConnectDefaults.AuthenticationScheme);
@@ -301,29 +309,40 @@ namespace PropertyManagement.Api.Controllers
         [HttpGet("google-signin-callback")]
         public async Task<IActionResult> GoogleCallback()
         {
+            // Redirect location after Google sign in
+            // Change for production
+            var redirectUrl = "http://localhost:4200/login"; // failed login
+            var returnTo = "http://localhost:4200/bookings-by-day"; // successful login
+
             var info = await _signInManager.GetExternalLoginInfoAsync();
 
             if (info == null)
-                return BadRequest();
+                return Redirect($"{redirectUrl}?error=External authentication failed.");
+                // return BadRequest();
 
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-            if (string.IsNullOrWhiteSpace(email)) return BadRequest("External authentication failed.");
+            if (string.IsNullOrWhiteSpace(email))
+                return Redirect($"{redirectUrl}?error=External authentication failed.");
+                // return BadRequest("External authentication failed.");
 
             // Check AllowedEmails table
             var normalizedEmail = _userManager.NormalizeEmail(email);
             var allowed = await _context.AllowedEmails
                 .AnyAsync(a => a.NormalizedEmail == normalizedEmail);
-            if (!allowed) return StatusCode(StatusCodes.Status403Forbidden);
+            if (!allowed)
+                return Redirect($"{redirectUrl}?error=You are not allowed access to this site.");
+                // return StatusCode(StatusCodes.Status403Forbidden);
 
             // Check IsActive status if returning user
             var user = await _userManager.FindByEmailAsync(email);
             if (user != null && !user.IsActive)
-            {
-                return Problem(
-                    title: "Account inactive",
-                    detail: "Your account has been deactivated.",
-                    statusCode: StatusCodes.Status403Forbidden);
-            }
+                return Redirect($"{redirectUrl}?error=Your account has been deactivated.");
+            // {
+            //     return Problem(
+            //         title: "Account inactive",
+            //         detail: "Your account has been deactivated.",
+            //         statusCode: StatusCodes.Status403Forbidden);
+            // }
 
             // If user is on AllowedEmails table and IsActive, they can sign in
             // Is this first time logging in?
@@ -344,14 +363,14 @@ namespace PropertyManagement.Api.Controllers
 
                 var createResult = await _userManager.CreateAsync(user);
                 if (!createResult.Succeeded)
-                {
-                    return IdentityValidationProblem(createResult);
-                }
+                    return Redirect($"{redirectUrl}?error=Failed to create user.");
+                    // return IdentityValidationProblem(createResult);
 
                 // Set default role to user
                 var roleResult = await _userManager.AddToRoleAsync(user, Roles.User);
                 if (!roleResult.Succeeded)
-                    return IdentityValidationProblem(roleResult);
+                    return Redirect($"{redirectUrl}?error=External authentication failed.");
+                    // return IdentityValidationProblem(roleResult);
             }
 
             // If this Google account has already been linked to an Identity user,
@@ -362,21 +381,20 @@ namespace PropertyManagement.Api.Controllers
                 isPersistent: false);
 
             if (signInResult.Succeeded)
-            {
-                return Ok();
-            }
+                return Redirect(returnTo);
+                // return Ok();
 
             // First Google login
             var addLoginResult = await _userManager.AddLoginAsync(user, info);
 
             if (!addLoginResult.Succeeded)
-            {
-                return IdentityValidationProblem(addLoginResult);
-            }
+                return Redirect($"{redirectUrl}?error=External authentication failed.");
+                // return IdentityValidationProblem(addLoginResult);
 
             await _signInManager.SignInAsync(user, isPersistent: false);
 
-            return Ok();
+            return Redirect(returnTo);
+            // return Ok();
         }
     }
 }
