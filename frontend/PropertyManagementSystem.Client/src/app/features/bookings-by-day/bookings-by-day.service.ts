@@ -9,7 +9,7 @@ export class BookingsByDayService {
   url = '/api/bookings/by-day';
 
   getBookingsByDay() {
-    return this.http.get<BookingsByDayResponse>(this.url, { withCredentials: true }).pipe(
+    return this.http.get<BookingsByDayResponse>(this.url).pipe(
       catchError((err: HttpErrorResponse) => {
         const backendMessage = typeof err.error === 'string' ? err.error : err.error?.message;
 

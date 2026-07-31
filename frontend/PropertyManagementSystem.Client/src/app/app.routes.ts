@@ -1,19 +1,15 @@
 import { Routes } from '@angular/router';
 import { Login } from './auth/login/login';
 import { BookingsByDay } from './features/bookings-by-day/bookings-by-day';
-import { Unauthenticated } from './features/auth/unauthenticated/unauthenticated';
-import { Unauthorized } from './features/auth/unauthorized/unauthorized';
+import { Forbidden } from './shared/components/forbidden/forbidden';
+import { authGuard } from './auth/auth-guard';
+import { adminGuard } from './auth/admin-guard';
 
 export const routes: Routes = [
   {
-    path: 'unauthenticated',
-    component: Unauthenticated,
-    title: 'Unauthenticated',
-  },
-  {
-    path: 'unauthorized',
-    component: Unauthorized,
-    title: 'Unauthorized',
+    path: 'forbidden',
+    component: Forbidden,
+    title: 'Forbidden',
   },
   {
     path: 'login',
@@ -24,5 +20,6 @@ export const routes: Routes = [
     path: 'bookings-by-day',
     component: BookingsByDay,
     title: 'Bookings by Day',
+    canMatch: [authGuard],
   },
 ];

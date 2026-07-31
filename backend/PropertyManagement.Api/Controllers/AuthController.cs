@@ -36,6 +36,24 @@ namespace PropertyManagement.Api.Controllers
             _signInManager = signInManager;
         }
 
+        // GET /api/auth/me - gets the current user's role
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<ActionResult> Me()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Unauthorized();
+            
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return Ok(new
+            {
+                userName = user.UserName,
+                roles
+            });
+        }
+
         // POST /api/auth/register - registers a new user, if their email is allowed
         [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterUserRequest registration)
@@ -317,32 +335,23 @@ namespace PropertyManagement.Api.Controllers
             var info = await _signInManager.GetExternalLoginInfoAsync();
 
             if (info == null)
-                return Redirect($"{redirectUrl}?error=External authentication failed.");
-                // return BadRequest();
+                return Redirect($"{redirectUrl}?error=external_auth_failed");
 
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
             if (string.IsNullOrWhiteSpace(email))
-                return Redirect($"{redirectUrl}?error=External authentication failed.");
-                // return BadRequest("External authentication failed.");
+                return Redirect($"{redirectUrl}?error=external_auth_failed");
 
             // Check AllowedEmails table
             var normalizedEmail = _userManager.NormalizeEmail(email);
             var allowed = await _context.AllowedEmails
                 .AnyAsync(a => a.NormalizedEmail == normalizedEmail);
             if (!allowed)
-                return Redirect($"{redirectUrl}?error=You are not allowed access to this site.");
-                // return StatusCode(StatusCodes.Status403Forbidden);
+                return Redirect($"{redirectUrl}?error=site_access_forbidden");
 
             // Check IsActive status if returning user
             var user = await _userManager.FindByEmailAsync(email);
             if (user != null && !user.IsActive)
-                return Redirect($"{redirectUrl}?error=Your account has been deactivated.");
-            // {
-            //     return Problem(
-            //         title: "Account inactive",
-            //         detail: "Your account has been deactivated.",
-            //         statusCode: StatusCodes.Status403Forbidden);
-            // }
+                return Redirect($"{redirectUrl}?error=account_deactivated");
 
             // If user is on AllowedEmails table and IsActive, they can sign in
             // Is this first time logging in?
@@ -363,14 +372,12 @@ namespace PropertyManagement.Api.Controllers
 
                 var createResult = await _userManager.CreateAsync(user);
                 if (!createResult.Succeeded)
-                    return Redirect($"{redirectUrl}?error=Failed to create user.");
-                    // return IdentityValidationProblem(createResult);
+                    return Redirect($"{redirectUrl}?error=failed_to_create_user");
 
                 // Set default role to user
                 var roleResult = await _userManager.AddToRoleAsync(user, Roles.User);
                 if (!roleResult.Succeeded)
-                    return Redirect($"{redirectUrl}?error=External authentication failed.");
-                    // return IdentityValidationProblem(roleResult);
+                    return Redirect($"{redirectUrl}?error=external_auth_failed");
             }
 
             // If this Google account has already been linked to an Identity user,
@@ -382,19 +389,16 @@ namespace PropertyManagement.Api.Controllers
 
             if (signInResult.Succeeded)
                 return Redirect(returnTo);
-                // return Ok();
 
             // First Google login
             var addLoginResult = await _userManager.AddLoginAsync(user, info);
 
             if (!addLoginResult.Succeeded)
-                return Redirect($"{redirectUrl}?error=External authentication failed.");
-                // return IdentityValidationProblem(addLoginResult);
+                return Redirect($"{redirectUrl}?error=external_auth_failed");
 
             await _signInManager.SignInAsync(user, isPersistent: false);
 
             return Redirect(returnTo);
-            // return Ok();
         }
     }
 }

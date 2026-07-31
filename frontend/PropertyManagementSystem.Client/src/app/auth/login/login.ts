@@ -3,8 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { LoginRequest } from './login-request.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
-import { HttpClient } from '@angular/common/http';
-import { DOCUMENT } from '@angular/common';
+import { toFriendlyError } from '../../shared/error-messages.ts/to-friendly-error';
 
 @Component({
   selector: 'app-login',
@@ -16,8 +15,6 @@ export class Login {
   private router = inject(Router);
   private cd = inject(ChangeDetectorRef);
   private authService = inject(AuthService);
-  private http = inject(HttpClient);
-  private document = inject(DOCUMENT);
   private activatedRoute = inject(ActivatedRoute);
 
   errorMessage: string | null = null;
@@ -26,7 +23,7 @@ export class Login {
     // If Google OAuth login fails, it redirects with a query parameter for the error
     // Use this to display that error message on the login HTML page
     this.activatedRoute.queryParams.subscribe((params) => {
-      this.errorMessage = params['error'];
+      this.errorMessage = params['error'] ? toFriendlyError(params['error']) : '';
     });
   }
 

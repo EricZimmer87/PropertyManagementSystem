@@ -1,7 +1,7 @@
 USE PropertyManagementDb;
 
 SELECT *
-FROM AspNetRoles;
+FROM AspNetUsers;
 
 -- SELECT u.UnitNumber,
 --     b.StartDate,
