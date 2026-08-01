@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BookingsByDayResponse } from './bookings-by-day-response.interface';
 import { BookingsByDayService } from './bookings-by-day.service';
@@ -16,22 +16,25 @@ export class BookingsByDay {
 
   isLoading: boolean = false;
   error: string | null = null;
-  bookings: BookingsByDayResponse | null = null;
+  bookings = signal<BookingsByDayResponse[]>([]);
 
   ngOnInit() {
     this.isLoading = true;
     this.bookingsByDayService.getBookingsByDay().subscribe({
-      next: (data) => {
-        this.bookings = data;
+      next: (data: BookingsByDayResponse[]) => {
+        console.log('API response (data):', data, 'isArray:', Array.isArray(data));
+        this.bookings.set(data);
         this.isLoading = false;
         this.error = null;
         this.cd.detectChanges();
       },
       error: (err) => {
         this.error = err.message || 'An error occurred';
-        this.bookings = null;
+        this.bookings.set([]);
         this.isLoading = false;
       },
     });
+
+    console.log('Bookings: ', this.bookings);
   }
 }

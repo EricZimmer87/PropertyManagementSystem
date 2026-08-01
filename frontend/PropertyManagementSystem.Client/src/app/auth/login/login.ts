@@ -55,15 +55,5 @@ export class Login {
     const url = `https://localhost:7016/api/auth/signin-google?returnUrl=${encodeURIComponent(returnUrl)}`;
 
     window.location.href = url;
-
-    // this.document.location.href = url;
-
-    // this.http.get<{ authURL: string }>(url).subscribe({
-    //   next: (data) => {
-    //     // Redirect the entire browser to the Google OAuth URL
-    //     this.document.location.href = data.authURL;
-    //   },
-    //   error: (err) => console.error('OAuth redirect failed', err),
-    // });
   }
 }

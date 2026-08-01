@@ -1,1 +1,30 @@
-<p>bookings-by-day works!</p>
+<!-- @if (isLoading) {
+  <p>Loading...</p>
+}
+@else if (error) {
+  <p>{{ error }}</p>
+}
+@else if (bookings.length === 0) {
+  <p>No bookings found.</p>
+}
+@else {
+  <table>
+    <tr>
+      <th>Unit Number</th>
+      <th>Created By</th>
+      <th>Guest Name</th>
+      <th>Start Date</th>
+      <th>End Date</th>
+    </tr>
+
+    @for (booking of bookings; track booking.UnitNumber) {
+      <tr>
+        <td>{{ booking.UnitNumber }}</td>
+        <td>{{ booking.CreatedByUserName }}</td>
+        <td>{{ booking.GuestName }}</td>
+        <td>{{ booking.StartDate }}</td>
+        <td>{{ booking.EndDate }}</td>
+      </tr>
+    }
+  </table>
+} -->
