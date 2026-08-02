@@ -1,30 +1,45 @@
-<!-- @if (isLoading) {
+@if (isLoading) {
   <p>Loading...</p>
-}
-@else if (error) {
-  <p>{{ error }}</p>
-}
-@else if (bookings.length === 0) {
-  <p>No bookings found.</p>
-}
-@else {
+} @else if (bookings.length === 0) {
+  <p>No bookings found for the selected date.</p>
+} @else {
   <table>
     <tr>
       <th>Unit Number</th>
+      <th>Created On</th>
       <th>Created By</th>
-      <th>Guest Name</th>
       <th>Start Date</th>
       <th>End Date</th>
+      <th>Guest Name</th>
+      <th>Address</th>
+      <th>City</th>
+      <th>State</th>
+      <th>Zip Code</th>
+      <th>Phone Number</th>
+      <th>Occupants</th>
+      <th>Status</th>
+      <th>Notes</th>
+      <th>Card Last Four</th>
     </tr>
 
-    @for (booking of bookings; track booking.UnitNumber) {
+    @for (booking of bookings; track booking.unitNumber) {
       <tr>
-        <td>{{ booking.UnitNumber }}</td>
-        <td>{{ booking.CreatedByUserName }}</td>
-        <td>{{ booking.GuestName }}</td>
-        <td>{{ booking.StartDate }}</td>
-        <td>{{ booking.EndDate }}</td>
+        <td>{{ booking.unitNumber }}</td>
+        <td>{{ booking.createdOn }}</td>
+        <td>{{ booking.createdByUserName ? booking.createdByUserName : '-' }}</td>
+        <td>{{ booking.startDate }}</td>
+        <td>{{ booking.endDate }}</td>
+        <td>{{ booking.guestName }}</td>
+        <td>{{ booking.address ? booking.address : '-' }}</td>
+        <td>{{ booking.city ? booking.city : '-' }}</td>
+        <td>{{ booking.state ? booking.state : '-' }}</td>
+        <td>{{ booking.zipCode ? booking.zipCode : '-' }}</td>
+        <td>{{ booking.phoneNumber ? booking.phoneNumber : '-' }}</td>
+        <td>{{ booking.occupants ? booking.occupants : '-' }}</td>
+        <td>{{ booking.status ? booking.status : '-' }}</td>
+        <td>{{ booking.notes ? booking.notes : '-' }}</td>
+        <td>{{ booking.cardLastFour ? booking.cardLastFour : '-' }}</td>
       </tr>
     }
   </table>
-} -->
+}
