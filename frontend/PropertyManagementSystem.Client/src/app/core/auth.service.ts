@@ -1,6 +1,6 @@
 import { Service, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { LoginRequest } from '../auth/login/login-request.interface';
+import { LoginRequest } from '../auth/login/login-request.type';
 import { catchError, throwError, Observable, of, tap, map, shareReplay } from 'rxjs';
 
 export type CurrentUser = {

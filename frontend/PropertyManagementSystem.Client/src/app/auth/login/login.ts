@@ -1,9 +1,10 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { LoginRequest } from './login-request.interface';
+import { LoginRequest } from './login-request.type';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { toFriendlyError } from '../../shared/error-messages.ts/to-friendly-error';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-login',
@@ -11,9 +12,10 @@ import { toFriendlyError } from '../../shared/error-messages.ts/to-friendly-erro
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login {
+export class Login implements OnInit {
   private router = inject(Router);
   private cd = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
   private authService = inject(AuthService);
   private activatedRoute = inject(ActivatedRoute);
 
@@ -22,9 +24,11 @@ export class Login {
   ngOnInit() {
     // If Google OAuth login fails, it redirects with a query parameter for the error
     // Use this to display that error message on the login HTML page
-    this.activatedRoute.queryParams.subscribe((params) => {
-      this.errorMessage = params['error'] ? toFriendlyError(params['error']) : '';
-    });
+    this.activatedRoute.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        this.errorMessage = params['error'] ? toFriendlyError(params['error']) : '';
+      });
   }
 
   loginForm = new FormGroup({
@@ -38,15 +42,18 @@ export class Login {
     const password = this.loginForm.value.password ?? '';
     const request: LoginRequest = { email, password };
 
-    this.authService.login(request).subscribe({
-      next: () => {
-        this.router.navigate(['/bookings-by-day']);
-      },
-      error: (err) => {
-        this.errorMessage = err.message || 'Login failed.';
-        this.cd.detectChanges();
-      },
-    });
+    this.authService
+      .login(request)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/bookings-by-day']);
+        },
+        error: (err) => {
+          this.errorMessage = err.message || 'Login failed.';
+          this.cd.detectChanges();
+        },
+      });
   }
 
   googleLoginSubmit() {

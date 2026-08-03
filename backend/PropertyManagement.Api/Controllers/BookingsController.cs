@@ -191,6 +191,7 @@ namespace PropertyManagement.Api.Controllers
                                orderby u.UnitNumber
                                select new BookingsByDayResponse
                                {
+                                    BookingId = b == null ? 0 : b.BookingId,
                                     CreatedOn = b == null ? default : b.CreatedOn,
                                     CreatedByUserName =
                                         b == null || b.CreatedByUser == null

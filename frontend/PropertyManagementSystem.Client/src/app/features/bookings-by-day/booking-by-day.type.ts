@@ -1,6 +1,7 @@
 import { BookingStatus } from '../../shared/enums/booking-status.enum';
 
 export type BookingByDay = {
+  bookingId: number;
   createdOn: string;
   createdByUserName?: string;
   unitNumber: string;

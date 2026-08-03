@@ -1,45 +1,81 @@
+@if (error) {
+  <p class="error-message">Error: {{ error }}</p>
+}
+
+<form [formGroup]="selectDayForm" (ngSubmit)="getBookingsByDay()">
+  <label for="selectedDay">Select Date:</label>
+  <input type="date" id="selectedDay" name="selectedDay" formControlName="selectedDay" required />
+  <button type="submit" class="submit-button">Go</button>
+</form>
+
 @if (isLoading) {
   <p>Loading...</p>
 } @else if (bookings.length === 0) {
   <p>No bookings found for the selected date.</p>
 } @else {
-  <table>
-    <tr>
-      <th>Unit Number</th>
-      <th>Created On</th>
-      <th>Created By</th>
-      <th>Start Date</th>
-      <th>End Date</th>
-      <th>Guest Name</th>
-      <th>Address</th>
-      <th>City</th>
-      <th>State</th>
-      <th>Zip Code</th>
-      <th>Phone Number</th>
-      <th>Occupants</th>
-      <th>Status</th>
-      <th>Notes</th>
-      <th>Card Last Four</th>
-    </tr>
-
-    @for (booking of bookings; track booking.unitNumber) {
+  <table class="styled-table">
+    <thead>
       <tr>
-        <td>{{ booking.unitNumber }}</td>
-        <td>{{ booking.createdOn }}</td>
-        <td>{{ booking.createdByUserName ? booking.createdByUserName : '-' }}</td>
-        <td>{{ booking.startDate }}</td>
-        <td>{{ booking.endDate }}</td>
-        <td>{{ booking.guestName }}</td>
-        <td>{{ booking.address ? booking.address : '-' }}</td>
-        <td>{{ booking.city ? booking.city : '-' }}</td>
-        <td>{{ booking.state ? booking.state : '-' }}</td>
-        <td>{{ booking.zipCode ? booking.zipCode : '-' }}</td>
-        <td>{{ booking.phoneNumber ? booking.phoneNumber : '-' }}</td>
-        <td>{{ booking.occupants ? booking.occupants : '-' }}</td>
-        <td>{{ booking.status ? booking.status : '-' }}</td>
-        <td>{{ booking.notes ? booking.notes : '-' }}</td>
-        <td>{{ booking.cardLastFour ? booking.cardLastFour : '-' }}</td>
+        <th>Unit Number</th>
+        <th>Created On</th>
+        <th>Created By</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Guest Name</th>
+        <th>Address</th>
+        <th>City</th>
+        <th>State</th>
+        <th>Zip Code</th>
+        <th>Phone Number</th>
+        <th>Occupants</th>
+        <th>Status</th>
+        <th>Notes</th>
+        <th>Card Last Four</th>
       </tr>
-    }
+    </thead>
+
+    <tbody>
+      @for (booking of bookings; track booking.bookingId) {
+        @if (booking.bookingId === 0) {
+          <tr>
+            <td>{{ booking.unitNumber }}</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+        } @else {
+          <tr>
+            <td>{{ booking.unitNumber }}</td>
+            <td>
+              {{ booking.createdOn | date }}
+            </td>
+            <td>{{ booking.createdByUserName ? booking.createdByUserName : '-' }}</td>
+            <td>{{ booking.startDate | date }}</td>
+            <td>{{ booking.endDate | date }}</td>
+            <td>{{ booking.guestName }}</td>
+            <td>{{ booking.address ? booking.address : '-' }}</td>
+            <td>{{ booking.city ? booking.city : '-' }}</td>
+            <td>{{ booking.state ? booking.state : '-' }}</td>
+            <td>{{ booking.zipCode ? booking.zipCode : '-' }}</td>
+            <td>{{ booking.phoneNumber ? booking.phoneNumber : '-' }}</td>
+            <td>{{ booking.occupants ? booking.occupants : '-' }}</td>
+            <td>{{ booking.status ? booking.status : '-' }}</td>
+            <td>{{ booking.notes ? booking.notes : '-' }}</td>
+            <td>{{ booking.cardLastFour ? booking.cardLastFour : '-' }}</td>
+          </tr>
+        }
+      }
+    </tbody>
   </table>
 }

@@ -4,6 +4,7 @@ namespace PropertyManagement.Api.DTOs.Bookings
 {
     public class BookingsByDayResponse
     {
+        public long BookingId { get; set; }
         public DateTime CreatedOn { get; set; }
         public string? CreatedByUserName { get; set; } = string.Empty;
 
