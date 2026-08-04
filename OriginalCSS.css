@@ -1,0 +1,117 @@
+/* You can add global styles to this file, and also import other style files */
+html {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin-bottom: 100px;
+}
+
+.error-message {
+  color: rgb(255, 0, 0);
+}
+
+/* Forms */
+form {
+  max-width: 400px;
+  margin: auto;
+  display: grid;
+  gap: 15px;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+  font-size: 1rem;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Buttons */
+
+.button {
+  padding: 10px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+}
+
+.button:hover {
+  background: #e0e0e0;
+}
+
+.button:active {
+  /* Move the button down by the same amount as the shadow */
+  transform: translateY(4px);
+  /* Shrink the shadow to simulate it being pressed into the page */
+  box-shadow: 0 2px #e0e0e0;
+}
+
+.blue-button:hover {
+  background: #005fa3;
+}
+
+.blue-button {
+  background: #0077cc;
+  color: #fff;
+}
+
+.blue-button:active {
+  /* Move the button down by the same amount as the shadow */
+  transform: translateY(4px);
+  /* Shrink the shadow to simulate it being pressed into the page */
+  box-shadow: 0 2px #2980b9;
+}
+
+/* Tables */
+
+.styled-table {
+  overflow: scroll;
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  min-width: 400px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table thead tr {
+  background-color: #3f3f3f;
+  color: #ffffff;
+  text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 12px 15px;
+}
+
+.styled-table tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+  border-bottom: 2px solid #3f3f3f;
+}
+
+.styled-table tbody tr:hover {
+  background-color: #b4b4b4;
+  transition: background-color 0.2s ease;
+}
