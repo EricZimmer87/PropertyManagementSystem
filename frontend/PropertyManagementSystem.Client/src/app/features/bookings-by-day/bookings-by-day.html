@@ -1,4 +1,4 @@
-<h1>Bookings by Day</h1>
+<h1 class="text-center">Bookings by Day</h1>
 
 @if (errorMessage()) {
   <p class="error-message">Error: {{ errorMessage() }}</p>
@@ -60,19 +60,13 @@
     <tbody>
       @for (booking of bookings(); track $index) {
         @if (!booking.bookingId) {
-          <tr
-            class="text-danger"
-            [class.multi-booking]="doubleBookedUnits().has(booking.unitNumber)"
-          >
-            <td>{{ booking.unitNumber }}</td>
+          <tr [class.bg-danger]="doubleBookedUnits().has(booking.unitNumber)">
+            <td>{{ booking.unitNumber }} {{ doubleBookedUnits().has(booking.unitNumber) }}</td>
             <td colspan="14">No active booking</td>
           </tr>
         } @else {
-          <tr
-            class="text-danger"
-            [class.multi-booking]="doubleBookedUnits().has(booking.unitNumber)"
-          >
-            <td>{{ booking.unitNumber }}</td>
+          <tr [class.bg-danger]="doubleBookedUnits().has(booking.unitNumber)">
+            <td>{{ booking.unitNumber }} {{ doubleBookedUnits().has(booking.unitNumber) }}</td>
             <td>
               {{ booking.createdOn | date: 'short' }}
             </td>

@@ -4,7 +4,7 @@
   <div class="d-flex justify-content-center">
     <form class="w-100" style="max-width: 320px" [formGroup]="loginForm" (submit)="submitLogin()">
       @if (errorMessage()) {
-        <p class="error-message">
+        <p class="text-danger">
           {{ errorMessage() }}
         </p>
       }

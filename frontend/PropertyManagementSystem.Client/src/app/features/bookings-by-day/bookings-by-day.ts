@@ -28,7 +28,10 @@ export class BookingsByDay {
     selectedDay: new FormControl(''),
   });
 
-  // Add a computed signal
+  constructor() {
+    this.getBookingsByDay();
+  }
+
   unitsWithMultipleBookings = computed(() => {
     const counts = new Map<string, number>();
     for (const b of this.bookings()) {
@@ -38,10 +41,6 @@ export class BookingsByDay {
     }
     return new Set([...counts.entries()].filter(([_, count]) => count > 1).map(([unit]) => unit));
   });
-
-  constructor() {
-    this.getBookingsByDay();
-  }
 
   getBookingsByDay(selectedDay?: string) {
     this.isLoading.set(true);
