@@ -42,23 +42,45 @@ input {
 
 /* Buttons */
 
-.submit-button {
-  background: #0077cc;
-  color: #fff;
+.button {
   padding: 10px 16px;
-  border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.3s ease;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 }
 
-.submit-button:hover {
+.button:hover {
+  background: #e0e0e0;
+}
+
+.button:active {
+  /* Move the button down by the same amount as the shadow */
+  transform: translateY(4px);
+  /* Shrink the shadow to simulate it being pressed into the page */
+  box-shadow: 0 2px #e0e0e0;
+}
+
+.blue-button:hover {
   background: #005fa3;
+}
+
+.blue-button {
+  background: #0077cc;
+  color: #fff;
+}
+
+.blue-button:active {
+  /* Move the button down by the same amount as the shadow */
+  transform: translateY(4px);
+  /* Shrink the shadow to simulate it being pressed into the page */
+  box-shadow: 0 2px #2980b9;
 }
 
 /* Tables */
 
 .styled-table {
+  overflow: scroll;
   border-collapse: collapse;
   margin: 25px 0;
   font-size: 0.9em;

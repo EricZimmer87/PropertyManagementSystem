@@ -1,12 +1,24 @@
+<h1>Bookings by Day</h1>
+
 @if (errorMessage()) {
   <p class="error-message">Error: {{ errorMessage() }}</p>
 }
 
-<form [formGroup]="selectDayForm" (ngSubmit)="getBookingsByDay()">
+<form
+  [formGroup]="selectDayForm"
+  (ngSubmit)="getBookingsByDay(this.selectDayForm.value.selectedDay?.toString())"
+>
   <label for="selectedDay">Select Date:</label>
   <input type="date" id="selectedDay" name="selectedDay" formControlName="selectedDay" required />
-  <button type="submit" class="submit-button">Go</button>
+  <button type="submit" class="button blue-button">Go to Selected Date</button>
 </form>
+
+<div class="day-nav-buttons">
+  <button class="button" (click)="prevMonthBookingsByDay()">Prev Month</button>
+  <button class="button" (click)="prevDayBookingsByDay()">Prev Day</button>
+  <button class="button" (click)="nextDayBookingsByDay()">Next Day</button>
+  <button class="button" (click)="nextMonthBookingsByDay()">Next Month</button>
+</div>
 
 @if (isLoading()) {
   <p>Loading...</p>

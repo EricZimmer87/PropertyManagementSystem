@@ -21,6 +21,9 @@ export class BookingsByDay {
   errorMessage = signal<string | null>(null);
   bookings = signal<BookingByDay[]>([]);
   doubleBookedUnits = signal<Set<string>>(new Set());
+
+  selectedDay = signal<string | null>(null);
+
   selectDayForm = new FormGroup({
     selectedDay: new FormControl(''),
   });
@@ -40,9 +43,8 @@ export class BookingsByDay {
     this.getBookingsByDay();
   }
 
-  getBookingsByDay() {
+  getBookingsByDay(selectedDay?: string) {
     this.isLoading.set(true);
-    const selectedDay = this.selectDayForm.value.selectedDay;
     const params = selectedDay ? new HttpParams().set('selectedDay', selectedDay) : undefined;
 
     this.bookingsByDayService
@@ -63,6 +65,7 @@ export class BookingsByDay {
           this.doubleBookedUnits.set(doubles);
 
           this.selectDayForm.patchValue({ selectedDay: data.selectedDay });
+          this.selectedDay.set(data.selectedDay);
           this.isLoading.set(false);
           this.errorMessage.set(null);
         },
@@ -72,5 +75,65 @@ export class BookingsByDay {
           this.isLoading.set(false);
         },
       });
+  }
+
+  nextDayBookingsByDay() {
+    const selectedDay = this.selectedDay();
+    if (!selectedDay) {
+      return;
+    }
+
+    // Add one to the selected day and then get bookings for that day.
+    const day = new Date(selectedDay);
+    day.setDate(day.getDate() + 1);
+    const nextDay = day.toISOString().split('T')[0];
+    this.selectedDay.set(nextDay);
+
+    this.getBookingsByDay(nextDay);
+  }
+
+  prevDayBookingsByDay() {
+    const selectedDay = this.selectedDay();
+    if (!selectedDay) {
+      return;
+    }
+
+    // Add one to the selected day and then get bookings for that day.
+    const day = new Date(selectedDay);
+    day.setDate(day.getDate() - 1);
+    const nextDay = day.toISOString().split('T')[0];
+    this.selectedDay.set(nextDay);
+
+    this.getBookingsByDay(nextDay);
+  }
+
+  nextMonthBookingsByDay() {
+    const selectedDay = this.selectedDay();
+    if (!selectedDay) {
+      return;
+    }
+
+    // Add one to the selected day and then get bookings for that day.
+    const day = new Date(selectedDay);
+    // Advance by one month (preserving the day-of-month when possible)
+    day.setMonth(day.getMonth() + 1);
+    const nextDay = day.toISOString().split('T')[0];
+    this.selectedDay.set(nextDay);
+
+    this.getBookingsByDay(nextDay);
+  }
+
+  prevMonthBookingsByDay() {
+    const selectedDay = this.selectedDay();
+    if (!selectedDay) {
+      return;
+    }
+
+    const day = new Date(selectedDay);
+    day.setMonth(day.getMonth() - 1);
+    const nextDay = day.toISOString().split('T')[0];
+    this.selectedDay.set(nextDay);
+
+    this.getBookingsByDay(nextDay);
   }
 }
