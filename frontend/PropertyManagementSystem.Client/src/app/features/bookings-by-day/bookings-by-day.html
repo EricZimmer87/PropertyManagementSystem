@@ -61,12 +61,12 @@
       @for (booking of bookings(); track $index) {
         @if (!booking.bookingId) {
           <tr [class.bg-danger]="doubleBookedUnits().has(booking.unitNumber)">
-            <td>{{ booking.unitNumber }} {{ doubleBookedUnits().has(booking.unitNumber) }}</td>
-            <td colspan="14">No active booking</td>
+            <td>{{ booking.unitNumber }}</td>
+            <td colspan="14" class="dithered">No active booking</td>
           </tr>
         } @else {
           <tr [class.bg-danger]="doubleBookedUnits().has(booking.unitNumber)">
-            <td>{{ booking.unitNumber }} {{ doubleBookedUnits().has(booking.unitNumber) }}</td>
+            <td>{{ booking.unitNumber }}</td>
             <td>
               {{ booking.createdOn | date: 'short' }}
             </td>

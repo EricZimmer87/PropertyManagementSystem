@@ -2,3 +2,7 @@ tr.bg-danger td,
 tr.bg-danger {
   background-color: #dc3545; /* Bootstrap danger color */
 }
+
+.dithered {
+  opacity: 0.5;
+}
