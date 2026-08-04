@@ -1,5 +1,5 @@
-@if (error) {
-  <p class="error-message">Error: {{ error }}</p>
+@if (errorMessage()) {
+  <p class="error-message">Error: {{ errorMessage() }}</p>
 }
 
 <form [formGroup]="selectDayForm" (ngSubmit)="getBookingsByDay()">
@@ -8,9 +8,9 @@
   <button type="submit" class="submit-button">Go</button>
 </form>
 
-@if (isLoading) {
+@if (isLoading()) {
   <p>Loading...</p>
-} @else if (bookings.length === 0) {
+} @else if (bookings().length === 0) {
   <p>No bookings found for the selected date.</p>
 } @else {
   <table class="styled-table">
@@ -35,30 +35,20 @@
     </thead>
 
     <tbody>
-      @for (booking of bookings; track booking.bookingId) {
-        @if (booking.bookingId === 0) {
-          <tr>
+      @for (booking of bookings(); track $index) {
+        @if (!booking.bookingId) {
+          <tr
+            class="no-active-booking"
+            [class.multi-booking]="doubleBookedUnits().has(booking.unitNumber)"
+          >
             <td>{{ booking.unitNumber }}</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
+            <td colspan="14">No active booking</td>
           </tr>
         } @else {
-          <tr>
+          <tr [class.multi-booking]="doubleBookedUnits().has(booking.unitNumber)">
             <td>{{ booking.unitNumber }}</td>
             <td>
-              {{ booking.createdOn | date }}
+              {{ booking.createdOn | date: 'short' }}
             </td>
             <td>{{ booking.createdByUserName ? booking.createdByUserName : '-' }}</td>
             <td>{{ booking.startDate | date }}</td>

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { LoginRequest } from './login-request.type';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,32 +12,33 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login implements OnInit {
+export class Login {
   private router = inject(Router);
-  private cd = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
   private authService = inject(AuthService);
   private activatedRoute = inject(ActivatedRoute);
 
-  errorMessage: string | null = null;
-
-  ngOnInit() {
-    // If Google OAuth login fails, it redirects with a query parameter for the error
-    // Use this to display that error message on the login HTML page
-    this.activatedRoute.queryParams
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((params) => {
-        this.errorMessage = params['error'] ? toFriendlyError(params['error']) : '';
-      });
-  }
+  errorMessage = signal<string | null>(null);
+  isSubmitting = signal(false);
 
   loginForm = new FormGroup({
     email: new FormControl(''),
     password: new FormControl(''),
   });
 
+  constructor() {
+    // If Google OAuth login fails, it redirects with a query parameter for the error.
+    // Use this to display that error message on the login HTML page.
+    this.errorMessage.set(
+      toFriendlyError(this.activatedRoute.snapshot.queryParams['error'] ?? null),
+    );
+  }
+
   submitLogin() {
-    this.errorMessage = null;
+    if (this.isSubmitting()) return;
+
+    this.isSubmitting.set(true);
+    this.errorMessage.set(null);
     const email = this.loginForm.value.email ?? '';
     const password = this.loginForm.value.password ?? '';
     const request: LoginRequest = { email, password };
@@ -46,21 +47,17 @@ export class Login implements OnInit {
       .login(request)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
-          this.router.navigate(['/bookings-by-day']);
-        },
+        next: () => this.router.navigate(['/bookings-by-day']),
         error: (err) => {
-          this.errorMessage = err.message || 'Login failed.';
-          this.cd.detectChanges();
+          this.errorMessage.set(err.message || 'Login failed.');
+          this.isSubmitting.set(false);
         },
       });
   }
 
   googleLoginSubmit() {
-    // Set where to return to after Google login
     const returnUrl = this.router.url || '/bookings-by-day';
     const url = `https://localhost:7016/api/auth/signin-google?returnUrl=${encodeURIComponent(returnUrl)}`;
-
     window.location.href = url;
   }
 }

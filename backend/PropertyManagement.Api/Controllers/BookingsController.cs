@@ -220,7 +220,9 @@ namespace PropertyManagement.Api.Controllers
                                })
                                .ToListAsync();
 
-            return Ok(query);
+            var response = new { selectedDay = day, bookings = query };
+
+            return Ok(response);
         }
     }
 }

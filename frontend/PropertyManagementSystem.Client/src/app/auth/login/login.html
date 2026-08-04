@@ -2,10 +2,10 @@
   <h2 class="form-header">Login</h2>
 
   <form [formGroup]="loginForm" (submit)="submitLogin()">
-    @if (errorMessage != null) {
-      <div class="error-message">
-        {{ errorMessage }}
-      </div>
+    @if (errorMessage()) {
+      <p class="error-message">
+        {{ errorMessage() }}
+      </p>
     }
 
     <label for="email">Email:</label>

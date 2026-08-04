@@ -1,4 +1,8 @@
-export function toFriendlyError(code?: string): string {
+export function toFriendlyError(code: string | null): string | null {
+  // This function can now be called on a null value,
+  // and it will return null instead of throwing an error.
+  if (!code) return null;
+
   switch (code) {
     case 'not_logged_in':
       return 'Please log in to continue.';

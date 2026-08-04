@@ -1,10 +1,11 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { BookingByDay } from './booking-by-day.type';
 import { BookingsByDayService } from './bookings-by-day.service';
 import { DatePipe } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { BookingsByDayResponse } from './bookings-by-day-response.type';
 
 @Component({
   selector: 'app-bookings-by-day',
@@ -12,25 +13,35 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './bookings-by-day.html',
   styleUrl: './bookings-by-day.css',
 })
-export class BookingsByDay implements OnInit {
+export class BookingsByDay {
   bookingsByDayService = inject(BookingsByDayService);
-  cd = inject(ChangeDetectorRef);
   destroyRef = inject(DestroyRef);
 
-  isLoading: boolean = true;
-  error: string | null = null;
-  bookings: BookingByDay[] = [];
-
+  isLoading = signal(true);
+  errorMessage = signal<string | null>(null);
+  bookings = signal<BookingByDay[]>([]);
+  doubleBookedUnits = signal<Set<string>>(new Set());
   selectDayForm = new FormGroup({
     selectedDay: new FormControl(''),
   });
 
-  ngOnInit() {
+  // Add a computed signal
+  unitsWithMultipleBookings = computed(() => {
+    const counts = new Map<string, number>();
+    for (const b of this.bookings()) {
+      if (b.bookingId !== 0) {
+        counts.set(b.unitNumber, (counts.get(b.unitNumber) ?? 0) + 1);
+      }
+    }
+    return new Set([...counts.entries()].filter(([_, count]) => count > 1).map(([unit]) => unit));
+  });
+
+  constructor() {
     this.getBookingsByDay();
   }
 
   getBookingsByDay() {
-    this.isLoading = true;
+    this.isLoading.set(true);
     const selectedDay = this.selectDayForm.value.selectedDay;
     const params = selectedDay ? new HttpParams().set('selectedDay', selectedDay) : undefined;
 
@@ -38,17 +49,27 @@ export class BookingsByDay implements OnInit {
       .getBookingsByDay(params)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (data: BookingByDay[]) => {
-          this.bookings = data;
-          this.isLoading = false;
-          this.error = null;
-          this.cd.detectChanges();
+        next: (data: BookingsByDayResponse) => {
+          this.bookings.set(data.bookings);
+
+          // Checks for double-booked units
+          const seen = new Set<string>();
+          const doubles = new Set<string>();
+          for (const b of data.bookings) {
+            if (b.bookingId === 0) continue;
+            if (seen.has(b.unitNumber)) doubles.add(b.unitNumber);
+            else seen.add(b.unitNumber);
+          }
+          this.doubleBookedUnits.set(doubles);
+
+          this.selectDayForm.patchValue({ selectedDay: data.selectedDay });
+          this.isLoading.set(false);
+          this.errorMessage.set(null);
         },
         error: (err) => {
-          this.error = err.message || 'An error occurred';
-          this.bookings = [];
-          this.isLoading = false;
-          this.cd.detectChanges();
+          this.errorMessage.set(err.message || 'An error occurred');
+          this.bookings.set([]);
+          this.isLoading.set(false);
         },
       });
   }
