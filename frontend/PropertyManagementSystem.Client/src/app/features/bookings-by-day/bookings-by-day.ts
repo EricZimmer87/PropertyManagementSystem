@@ -6,10 +6,11 @@ import { DatePipe } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BookingsByDayResponse } from './bookings-by-day-response.type';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-bookings-by-day',
-  imports: [DatePipe, ReactiveFormsModule],
+  imports: [DatePipe, ReactiveFormsModule, RouterLink],
   templateUrl: './bookings-by-day.html',
   styleUrl: './bookings-by-day.css',
 })

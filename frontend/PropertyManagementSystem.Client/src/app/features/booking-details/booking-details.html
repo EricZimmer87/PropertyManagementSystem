@@ -1,0 +1,51 @@
+<h1 class="mb-3">Booking Details</h1>
+
+<dl class="row">
+  <dt class="col-sm-1">Unit Number</dt>
+  <dd class="col-sm-11">{{ booking()?.unitNumber ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Created On</dt>
+  <dd class="col-sm-11">{{ booking()?.createdOn | date: 'short' }}</dd>
+
+  <dt class="col-sm-1">Created By</dt>
+  <dd class="col-sm-11">
+    {{ booking()?.createdByUserName === '' ? '-' : booking()?.createdByUserName }}
+  </dd>
+
+  <dt class="col-sm-1">Start Date</dt>
+  <dd class="col-sm-11">{{ booking()?.startDate ?? '-' }}</dd>
+
+  <dt class="col-sm-1">End Date</dt>
+  <dd class="col-sm-11">{{ booking()?.endDate ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Guest Name</dt>
+  <dd class="col-sm-11">{{ booking()?.guestName ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Occupants</dt>
+  <dd class="col-sm-11">{{ booking()?.occupants ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Status</dt>
+  <dd class="col-sm-11">{{ booking()?.status ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Notes</dt>
+  <dd class="col-sm-11">{{ booking()?.notes ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Card Last Four</dt>
+  <dd class="col-sm-11">{{ booking()?.cardLastFour ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Modified On</dt>
+  <dd class="col-sm-11">{{ booking()?.modifiedOn ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Modified By</dt>
+  <dd class="col-sm-11">
+    {{ booking()?.modifiedByUserName === '' ? '-' : booking()?.modifiedByUserName }}
+  </dd>
+
+  <dt class="col-sm-1">Canceled On</dt>
+  <dd class="col-sm-11">{{ booking()?.canceledOn ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Canceled By</dt>
+  <dd class="col-sm-11">
+    {{ booking()?.canceledByUserName === '' ? '-' : booking()?.canceledByUserName }}
+  </dd>
+</dl>

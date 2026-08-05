@@ -1,10 +1,10 @@
-<h1 class="text-center">Bookings by Day</h1>
+<h1 class="">Bookings by Day</h1>
 
 @if (errorMessage()) {
   <p class="error-message">Error: {{ errorMessage() }}</p>
 }
 
-<div class="d-flex justify-content-center">
+<div class="d-flex">
   <form
     [formGroup]="selectDayForm"
     (ngSubmit)="getBookingsByDay(selectDayForm.value.selectedDay?.toString())"
@@ -24,7 +24,7 @@
   </form>
 </div>
 
-<div class="d-flex justify-content-center gap-3 mt-3 mb-3">
+<div class="d-flex flex-wrap gap-3 mt-3 mb-3">
   <button class="btn btn-secondary" (click)="prevMonthBookingsByDay()">Prev Month</button>
   <button class="btn btn-secondary" (click)="prevDayBookingsByDay()">Prev Day</button>
   <button class="btn btn-secondary" (click)="nextDayBookingsByDay()">Next Day</button>
@@ -54,6 +54,7 @@
         <th scope="col">Status</th>
         <th scope="col">Notes</th>
         <th scope="col">Card Last Four</th>
+        <th scope="col"></th>
       </tr>
     </thead>
 
@@ -85,6 +86,7 @@
             <td>{{ booking.status ? booking.status : '-' }}</td>
             <td>{{ booking.notes ? booking.notes : '-' }}</td>
             <td>{{ booking.cardLastFour ? booking.cardLastFour : '-' }}</td>
+            <td><a [routerLink]="['../bookings', booking.bookingId]">Details</a></td>
           </tr>
         }
       }
