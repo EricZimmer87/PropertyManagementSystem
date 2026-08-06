@@ -13,10 +13,10 @@
   </dd>
 
   <dt class="col-sm-1">Start Date</dt>
-  <dd class="col-sm-11">{{ booking()?.startDate ?? '-' }}</dd>
+  <dd class="col-sm-11">{{ booking()?.startDate | date: 'fullDate' }}</dd>
 
   <dt class="col-sm-1">End Date</dt>
-  <dd class="col-sm-11">{{ booking()?.endDate ?? '-' }}</dd>
+  <dd class="col-sm-11">{{ booking()?.endDate | date: 'fullDate' }}</dd>
 
   <dt class="col-sm-1">Guest Name</dt>
   <dd class="col-sm-11">{{ booking()?.guestName ?? '-' }}</dd>
@@ -25,7 +25,7 @@
   <dd class="col-sm-11">{{ booking()?.occupants ?? '-' }}</dd>
 
   <dt class="col-sm-1">Status</dt>
-  <dd class="col-sm-11">{{ booking()?.status ?? '-' }}</dd>
+  <dd class="col-sm-11">{{ booking()?.status | bookingStatusLabel }}</dd>
 
   <dt class="col-sm-1">Notes</dt>
   <dd class="col-sm-11">{{ booking()?.notes ?? '-' }}</dd>

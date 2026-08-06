@@ -4,10 +4,11 @@ import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BookingDetailsResponse } from '../../shared/types/booking-details-response.type';
 import { DatePipe } from '@angular/common';
+import { BookingStatusLabelPipe } from '../../shared/pipes/booking-status-label.pipe'
 
 @Component({
   selector: 'app-booking-details',
-  imports: [DatePipe],
+  imports: [DatePipe, BookingStatusLabelPipe],
   templateUrl: './booking-details.html',
   styleUrl: './booking-details.css',
 })

@@ -7,23 +7,28 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BookingsByDayResponse } from './bookings-by-day-response.type';
 import { RouterLink } from '@angular/router';
+import { BookingStatusLabelPipe } from '../../shared/pipes/booking-status-label.pipe';
+import { BookingStatus } from '../../shared/enums/booking-status.enum';
 
 @Component({
   selector: 'app-bookings-by-day',
-  imports: [DatePipe, ReactiveFormsModule, RouterLink],
+  imports: [DatePipe, ReactiveFormsModule, RouterLink, BookingStatusLabelPipe],
   templateUrl: './bookings-by-day.html',
   styleUrl: './bookings-by-day.css',
 })
 export class BookingsByDay {
-  bookingsByDayService = inject(BookingsByDayService);
+  public readonly BookingStatus = BookingStatus;
+  private readonly bookingsByDayService = inject(BookingsByDayService);
   destroyRef = inject(DestroyRef);
 
   isLoading = signal(true);
   errorMessage = signal<string | null>(null);
   bookings = signal<BookingByDay[]>([]);
-  doubleBookedUnits = signal<Set<string>>(new Set());
-
   selectedDay = signal<string | null>(null);
+
+  doubleBookedUnits = computed(() => {
+    return this.bookingsByDayService.findDoubleBookedUnits(this.bookings());
+  });
 
   selectDayForm = new FormGroup({
     selectedDay: new FormControl(''),
@@ -32,16 +37,6 @@ export class BookingsByDay {
   constructor() {
     this.getBookingsByDay();
   }
-
-  unitsWithMultipleBookings = computed(() => {
-    const counts = new Map<string, number>();
-    for (const b of this.bookings()) {
-      if (b.bookingId !== 0) {
-        counts.set(b.unitNumber, (counts.get(b.unitNumber) ?? 0) + 1);
-      }
-    }
-    return new Set([...counts.entries()].filter(([_, count]) => count > 1).map(([unit]) => unit));
-  });
 
   getBookingsByDay(selectedDay?: string) {
     this.isLoading.set(true);
@@ -53,21 +48,9 @@ export class BookingsByDay {
       .subscribe({
         next: (data: BookingsByDayResponse) => {
           this.bookings.set(data.bookings);
-
-          // Checks for double-booked units
-          const seen = new Set<string>();
-          const doubles = new Set<string>();
-          for (const b of data.bookings) {
-            if (b.bookingId === 0) continue;
-            if (seen.has(b.unitNumber)) doubles.add(b.unitNumber);
-            else seen.add(b.unitNumber);
-          }
-          this.doubleBookedUnits.set(doubles);
-
-          this.selectDayForm.patchValue({ selectedDay: data.selectedDay });
           this.selectedDay.set(data.selectedDay);
-          this.isLoading.set(false);
           this.errorMessage.set(null);
+          this.isLoading.set(false);
         },
         error: (err) => {
           this.errorMessage.set(err.message || 'An error occurred');
@@ -98,7 +81,7 @@ export class BookingsByDay {
       return;
     }
 
-    // Add one to the selected day and then get bookings for that day.
+    // Subtract one to the selected day and then get bookings for that day.
     const day = new Date(selectedDay);
     day.setDate(day.getDate() - 1);
     const nextDay = day.toISOString().split('T')[0];

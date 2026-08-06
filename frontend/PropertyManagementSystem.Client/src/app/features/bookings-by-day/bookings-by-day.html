@@ -18,6 +18,7 @@
       id="selectedDay"
       name="selectedDay"
       formControlName="selectedDay"
+      [value]="selectedDay()"
       required
     />
     <button type="submit" class="btn btn-primary mt-3 w-100">Go to Selected Date</button>
@@ -25,10 +26,10 @@
 </div>
 
 <div class="d-flex flex-wrap gap-3 mt-3 mb-3">
-  <button class="btn btn-secondary" (click)="prevMonthBookingsByDay()">Prev Month</button>
-  <button class="btn btn-secondary" (click)="prevDayBookingsByDay()">Prev Day</button>
-  <button class="btn btn-secondary" (click)="nextDayBookingsByDay()">Next Day</button>
-  <button class="btn btn-secondary" (click)="nextMonthBookingsByDay()">Next Month</button>
+  <button class="btn btn-secondary" (click)="prevMonthBookingsByDay()"><< Prev Month</button>
+  <button class="btn btn-secondary" (click)="prevDayBookingsByDay()">< Prev Day</button>
+  <button class="btn btn-secondary" (click)="nextDayBookingsByDay()">Next Day ></button>
+  <button class="btn btn-secondary" (click)="nextMonthBookingsByDay()">Next Month >></button>
 </div>
 
 @if (isLoading()) {
@@ -36,6 +37,8 @@
 } @else if (bookings().length === 0) {
   <p>No bookings found for the selected date.</p>
 } @else {
+  <h2>{{ selectedDay() | date: 'EEEE, MMMM d, y' }}</h2>
+
   <table class="table table-striped table-bordered">
     <thead>
       <tr class="table">
@@ -61,12 +64,15 @@
     <tbody>
       @for (booking of bookings(); track $index) {
         @if (!booking.bookingId) {
-          <tr [class.bg-danger]="doubleBookedUnits().has(booking.unitNumber)">
+          <tr>
             <td>{{ booking.unitNumber }}</td>
             <td colspan="14" class="dithered">No active booking</td>
           </tr>
         } @else {
-          <tr [class.bg-danger]="doubleBookedUnits().has(booking.unitNumber)">
+          <tr
+            [class.double-booked]="doubleBookedUnits().has(booking.unitNumber)"
+            [class.checked-in]="booking.status === BookingStatus.CheckedIn"
+          >
             <td>{{ booking.unitNumber }}</td>
             <td>
               {{ booking.createdOn | date: 'short' }}
@@ -83,7 +89,7 @@
             <td>{{ booking.zipCode ? booking.zipCode : '-' }}</td>
             <td>{{ booking.phoneNumber ? booking.phoneNumber : '-' }}</td>
             <td>{{ booking.occupants ? booking.occupants : '-' }}</td>
-            <td>{{ booking.status ? booking.status : '-' }}</td>
+            <td>{{ booking.status | bookingStatusLabel }}</td>
             <td>{{ booking.notes ? booking.notes : '-' }}</td>
             <td>{{ booking.cardLastFour ? booking.cardLastFour : '-' }}</td>
             <td><a [routerLink]="['../bookings', booking.bookingId]">Details</a></td>
