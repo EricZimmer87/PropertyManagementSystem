@@ -1,13 +1,13 @@
 <h1 class="">Bookings by Day</h1>
 
 @if (errorMessage()) {
-  <p class="error-message">Error: {{ errorMessage() }}</p>
+  <p class="text-danger">Error: {{ errorMessage() }}</p>
 }
 
 <div class="d-flex">
   <form
     [formGroup]="selectDayForm"
-    (ngSubmit)="getBookingsByDay(selectDayForm.value.selectedDay?.toString())"
+    (ngSubmit)="onSubmitSelectedDay()"
     class="w-100"
     style="max-width: 320px"
   >
@@ -26,10 +26,10 @@
 </div>
 
 <div class="d-flex flex-wrap gap-3 mt-3 mb-3">
-  <button class="btn btn-secondary" (click)="prevMonthBookingsByDay()"><< Prev Month</button>
-  <button class="btn btn-secondary" (click)="prevDayBookingsByDay()">< Prev Day</button>
-  <button class="btn btn-secondary" (click)="nextDayBookingsByDay()">Next Day ></button>
-  <button class="btn btn-secondary" (click)="nextMonthBookingsByDay()">Next Month >></button>
+  <button class="btn btn-secondary" (click)="addMonth(-1)"><< Prev Month</button>
+  <button class="btn btn-secondary" (click)="addDay(-1)">< Prev Day</button>
+  <button class="btn btn-secondary" (click)="addDay(1)">Next Day ></button>
+  <button class="btn btn-secondary" (click)="addMonth(1)">Next Month >></button>
 </div>
 
 @if (isLoading()) {

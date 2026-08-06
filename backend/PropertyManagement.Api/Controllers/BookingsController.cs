@@ -68,7 +68,10 @@ namespace PropertyManagement.Api.Controllers
             // StartDate must be less than EndDate
             // The dates can be equal in case the business wants to charge hourly rates
             if (request.StartDate > request.EndDate)
-                return Conflict("End date must be greater than start date.");
+                return Conflict( new
+                {
+                    message = "End date must be greater than start date."
+                });
 
             var booking = new Booking
             {

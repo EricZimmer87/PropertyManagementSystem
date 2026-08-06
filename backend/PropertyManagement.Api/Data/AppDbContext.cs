@@ -66,6 +66,14 @@ namespace PropertyManagement.Api.Data
                 .WithMany(x => x.Bookings)
                 .HasForeignKey(x => x.GuestId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            // Ensure the time ends with a 'Z' to denote UTC timezone for proper
+            // conversion on the front end
+            builder.Entity<Booking>()
+                .Property(b => b.CreatedOn)
+                .HasConversion(
+                    value => value,
+                    value => DateTime.SpecifyKind(value, DateTimeKind.Utc));
         }
 
         private void NormalizeGuestPhoneNumbers()
