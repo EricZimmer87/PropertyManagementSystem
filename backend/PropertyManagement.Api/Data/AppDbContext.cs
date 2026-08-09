@@ -68,12 +68,26 @@ namespace PropertyManagement.Api.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             // Ensure the time ends with a 'Z' to denote UTC timezone for proper
-            // conversion on the front end
+            // conversion on the front end using date pipe.
             builder.Entity<Booking>()
                 .Property(b => b.CreatedOn)
                 .HasConversion(
                     value => value,
                     value => DateTime.SpecifyKind(value, DateTimeKind.Utc));
+
+            builder.Entity<Booking>()
+                .Property(b => b.CanceledOn)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null
+                );
+
+            builder.Entity<Booking>()
+                .Property(b => b.ModifiedOn)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null
+                );
         }
 
         private void NormalizeGuestPhoneNumbers()
