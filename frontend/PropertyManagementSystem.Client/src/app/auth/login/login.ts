@@ -47,12 +47,16 @@ export class Login {
       .login(request)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => this.router.navigate(['/bookings-by-day']),
+        next: () => {
+          this.authService.refreshSession();
+          this.router.navigate(['/bookings-by-day'])
+        },
         error: (err) => {
           this.errorMessage.set(err.message || 'Login failed.');
           this.isSubmitting.set(false);
         },
       });
+
   }
 
   googleLoginSubmit() {

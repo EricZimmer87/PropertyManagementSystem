@@ -72,6 +72,7 @@
           <tr
             [class.double-booked]="doubleBookedUnits().has(booking.unitNumber)"
             [class.checked-in]="booking.status === BookingStatus.CheckedIn"
+            [class.canceled]="booking.status === BookingStatus.Canceled"
           >
             <td>{{ booking.unitNumber }}</td>
             <td>

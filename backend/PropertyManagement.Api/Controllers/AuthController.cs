@@ -54,6 +54,15 @@ namespace PropertyManagement.Api.Controllers
             });
         }
 
+        // GET /api/auth/session - checks if the user is logged in
+        [HttpGet("session")]
+        public async Task<ActionResult<object>> Session()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            return Ok(new { isAuthenticated = user != null });;
+        }
+
         // POST /api/auth/register - registers a new user, if their email is allowed
         [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterUserRequest registration)

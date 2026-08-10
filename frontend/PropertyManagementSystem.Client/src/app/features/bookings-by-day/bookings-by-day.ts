@@ -45,6 +45,7 @@ export class BookingsByDay {
 
     return error?.message ?? null;
   });
+
   readonly doubleBookedUnits = computed(() =>
     this.bookingsByDayService.findDoubleBookedUnits(this.bookings()),
   );
@@ -92,6 +93,7 @@ export class BookingsByDay {
     this.requestedDay.set(this.formatDate(day));
   }
 
+  // Helper for addDay/Month
   private formatDate(day: Date): string {
     const year = day.getFullYear();
     const month = String(day.getMonth() + 1).padStart(2, '0');
@@ -99,34 +101,4 @@ export class BookingsByDay {
 
     return `${year}-${month}-${date}`;
   }
-
-  // nextMonthBookingsByDay() {
-  //   const selectedDay = this.selectedDay();
-  //   if (!selectedDay) {
-  //     return;
-  //   }
-
-  //   // Add one to the selected day and then get bookings for that day.
-  //   const day = new Date(selectedDay);
-  //   // Advance by one month (preserving the day-of-month when possible)
-  //   day.setMonth(day.getMonth() + 1);
-  //   const nextDay = day.toISOString().split('T')[0];
-  //   this.selectedDay.set(nextDay);
-
-  //   this.getBookingsByDay(nextDay);
-  // }
-
-  // prevMonthBookingsByDay() {
-  //   const selectedDay = this.selectedDay();
-  //   if (!selectedDay) {
-  //     return;
-  //   }
-
-  //   const day = new Date(selectedDay);
-  //   day.setMonth(day.getMonth() - 1);
-  //   const nextDay = day.toISOString().split('T')[0];
-  //   this.selectedDay.set(nextDay);
-
-  //   this.getBookingsByDay(nextDay);
-  // }
 }

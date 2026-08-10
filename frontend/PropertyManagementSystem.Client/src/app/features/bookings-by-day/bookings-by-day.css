@@ -3,7 +3,8 @@ tr.double-booked {
   background-color: rgb(220, 53, 69, 0.5) !important; /* Bootstrap danger color */
 }
 
-.dithered {
+.dithered,
+.canceled {
   opacity: 0.5;
 }
 
