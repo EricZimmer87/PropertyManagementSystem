@@ -49,14 +49,13 @@ export class Login {
       .subscribe({
         next: () => {
           this.authService.refreshSession();
-          this.router.navigate(['/bookings-by-day'])
+          this.router.navigate(['/bookings-by-day']);
         },
         error: (err) => {
           this.errorMessage.set(err.message || 'Login failed.');
           this.isSubmitting.set(false);
         },
       });
-
   }
 
   googleLoginSubmit() {

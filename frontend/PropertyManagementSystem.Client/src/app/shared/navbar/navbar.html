@@ -1,5 +1,29 @@
 @if (isLoggedIn()) {
-  <p>Logged in.</p>
-} @else {
-  <p>Not logged in.</p>
+  <nav class="navbar navbar-expand-sm bg-light mb-5">
+    <ul class="nav nav-pills">
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" [routerLink]="['/bookings-by-day']"
+          >Bookings By Day</a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" [routerLink]="['/bookings']">Bookings</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" [routerLink]="['/guests']">Guests</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active">Disabled</a>
+      </li>
+    </ul>
+
+    <ul class="nav nav-pills ms-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="">Profile</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" (click)="logout()">Logout</a>
+      </li>
+    </ul>
+  </nav>
 }

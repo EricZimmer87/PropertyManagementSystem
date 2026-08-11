@@ -1,0 +1,138 @@
+<h1 class="mb-3">Bookings</h1>
+
+@if (errorMessage()) {
+  <p class="text-danger">Error: {{ errorMessage() }}</p>
+}
+
+<input
+  type="text"
+  class="form-control mb-3 w-100"
+  style="max-width: 320px"
+  placeholder="Search bookings..."
+  [value]="search()"
+  (input)="onSearchInput($any($event.target).value)"
+/>
+
+@if (isLoading()) {
+  <p>Loading...</p>
+} @else if (bookings().length === 0) {
+  <p>No bookings found.</p>
+} @else {
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr class="table">
+        <th scope="col">Unit Number</th>
+        <th scope="col">Created On</th>
+        <th scope="col">Created By</th>
+        <th scope="col">Start Date</th>
+        <th scope="col">End Date</th>
+        <th scope="col">Guest Name</th>
+        <th scope="col">Occupants</th>
+        <th scope="col">Status</th>
+        <th scope="col">Notes</th>
+        <th scope="col">CardLastFour</th>
+        <th scope="col">Modified On</th>
+        <th scope="col">Modified By</th>
+        <th scope="col">Canceled On</th>
+        <th scope="col">Canceled By</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (booking of bookings(); track booking.bookingId) {
+        @if (!booking.bookingId) {
+          <tr>
+            <td>{{ booking.unitNumber }}</td>
+            <td colspan="14" class="dithered">No active booking</td>
+          </tr>
+        } @else {
+          <tr
+            [class.checked-in]="booking.status === BookingStatus.CheckedIn"
+            [class.canceled]="booking.status === BookingStatus.Canceled"
+          >
+            <td>{{ booking.unitNumber }}</td>
+            <td>
+              {{ booking.createdOn | date: 'short' }}
+            </td>
+            <td>
+              {{ booking.createdByUserName ? booking.createdByUserName : '-' }}
+            </td>
+            <td>{{ booking.startDate | date }}</td>
+            <td>{{ booking.endDate | date }}</td>
+            <td>{{ booking.guestName }}</td>
+            <td>{{ booking.occupants ? booking.occupants : '-' }}</td>
+            <td>{{ booking.status | bookingStatusLabel }}</td>
+            <td>{{ booking.notes ? booking.notes : '-' }}</td>
+            <td>{{ booking.cardLastFour ? booking.cardLastFour : '-' }}</td>
+            <td>{{ booking.modifiedOn | date: 'short' }}</td>
+            <td>{{ booking.modifiedByUserName ? booking.modifiedByUserName : '-' }}</td>
+            <td>{{ booking.canceledOn | date: 'short' }}</td>
+            <td>{{ booking.canceledByUserName ? booking.canceledByUserName : '-' }}</td>
+            <td><a [routerLink]="['../bookings', booking.bookingId]">Details</a></td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      @if (pagination(); as p) {
+        <li class="page-item" [class.disabled]="!p.hasPreviousPage">
+          <a
+            class="page-link"
+            [class.text-muted]="!p.hasPreviousPage"
+            (click)="p.hasPreviousPage && changePage(p.pageNumber - 1)"
+          >
+            Previous
+          </a>
+        </li>
+
+        @for (page of pagesArray(p.totalPages); track page) {
+          <li class="page-item" [class.active]="page === p.pageNumber">
+            <a class="page-link" (click)="changePage(page)">{{ page }}</a>
+          </li>
+        }
+
+        <li class="page-item" [class.disabled]="!p.hasNextPage">
+          <a
+            class="page-link"
+            [class.text-muted]="!p.hasNextPage"
+            (click)="p.hasNextPage && changePage(p.pageNumber + 1)"
+          >
+            Next
+          </a>
+        </li>
+      }
+    </ul>
+
+    <div class="dropdown">
+      <button
+        class="btn btn-primary dropdown-toggle"
+        type="button"
+        [class.show]="dropdownOpen()"
+        (click)="dropdownOpen.set(!dropdownOpen())"
+      >
+        Page Size ({{ pageSize() }})
+      </button>
+      <ul class="dropdown-menu" [class.show]="dropdownOpen()">
+        <li>
+          <a class="dropdown-item" (click)="changePageSize(10)" [class.active]="pageSize() === 10"
+            >10</a
+          >
+        </li>
+        <li>
+          <a class="dropdown-item" (click)="changePageSize(25)" [class.active]="pageSize() === 25"
+            >25</a
+          >
+        </li>
+        <li>
+          <a class="dropdown-item" (click)="changePageSize(50)" [class.active]="pageSize() === 50"
+            >50</a
+          >
+        </li>
+      </ul>
+    </div>
+  </nav>
+}

@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BookingDetailsResponse } from '../../shared/types/booking-details-response.type';
 import { DatePipe } from '@angular/common';
-import { BookingStatusLabelPipe } from '../../shared/pipes/booking-status-label.pipe'
+import { BookingStatusLabelPipe } from '../../shared/pipes/booking-status-label.pipe';
 
 @Component({
   selector: 'app-booking-details',
@@ -38,6 +38,5 @@ export class BookingDetails {
           this.isLoading.set(false);
         },
       });
-    console.log(bookingId);
   }
 }

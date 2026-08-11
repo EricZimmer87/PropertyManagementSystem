@@ -62,7 +62,7 @@
     </thead>
 
     <tbody>
-      @for (booking of bookings(); track $index) {
+      @for (booking of bookings(); track booking.bookingId) {
         @if (!booking.bookingId) {
           <tr>
             <td>{{ booking.unitNumber }}</td>

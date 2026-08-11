@@ -12,11 +12,11 @@ export const authGuard: CanActivateFn = () => {
   return auth.loadMe().pipe(
     map((user) => {
       if (user) return true;
-      router.navigate(['/login'], { queryParams: { error: 'not_logged_in' } });
+      router.navigate(['/'], { queryParams: { error: 'not_logged_in' } });
       return false;
     }),
     catchError(() => {
-      router.navigate(['/login'], { queryParams: { error: 'auth_failed' } });
+      router.navigate(['/'], { queryParams: { error: 'auth_failed' } });
       return of(false);
     }),
   );

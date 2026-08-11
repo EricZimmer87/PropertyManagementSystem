@@ -19,12 +19,11 @@ export const adminGuard: CanActivateFn = () => {
   return auth.loadMe().pipe(
     map((user) => {
       const ok = !!user && user.roles.includes(Roles.Admin);
-      if (!ok)
-        router.navigate(['/forbidden'], { queryParams: { error: 'forbidden' } });
+      if (!ok) router.navigate(['/forbidden'], { queryParams: { error: 'forbidden' } });
       return ok;
     }),
     catchError(() => {
-      router.navigate(['/login'], { queryParams: { error: 'auth_failed' } });
+      router.navigate(['/'], { queryParams: { error: 'auth_failed' } });
       return of(false);
     }),
   );

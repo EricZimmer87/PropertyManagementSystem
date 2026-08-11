@@ -1,7 +1,7 @@
 USE PropertyManagementDb;
 
 SELECT *
-FROM AspNetUsers;
+FROM Bookings;
 
 -- SELECT u.UnitNumber,
 --     b.StartDate,

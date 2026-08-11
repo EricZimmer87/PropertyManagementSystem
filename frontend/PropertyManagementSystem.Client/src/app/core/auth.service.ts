@@ -14,6 +14,7 @@ export class AuthService {
   http = inject(HttpClient);
 
   loginUrl = '/api/auth/login';
+  logoutUrl = '/api/auth/logout';
   sessionUrl = '/api/auth/session';
   meUrl = '/api/auth/me';
 
@@ -26,6 +27,16 @@ export class AuthService {
         const backendMessage = typeof err.error === 'string' ? err.error : err.error?.message;
 
         return throwError(() => new Error(backendMessage || 'Login failed.'));
+      }),
+    );
+  }
+
+  logout() {
+    return this.http.delete<void>(this.logoutUrl).pipe(
+      catchError((err: HttpErrorResponse) => {
+        const backendMessage = typeof err.error === 'string' ? err.error : err.error?.message;
+
+        return throwError(() => new Error(backendMessage || 'Logout failed.'));
       }),
     );
   }
