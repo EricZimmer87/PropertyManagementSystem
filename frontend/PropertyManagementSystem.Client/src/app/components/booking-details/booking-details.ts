@@ -1,10 +1,10 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
-import { GetBookingByIdService } from '../../shared/booking-by-id/get-booking-by-id.service';
+import { GetBookingByIdService } from '../../services/bookings/get-booking-by-id.service';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BookingDetailsResponse } from '../../shared/types/booking-details-response.type';
+import { BookingDetailsResponse } from '../../types/bookings/booking-details-response.type';
 import { DatePipe } from '@angular/common';
-import { BookingStatusLabelPipe } from '../../shared/pipes/booking-status-label.pipe';
+import { BookingStatusLabelPipe } from '../../pipes/booking-status-label.pipe';
 
 @Component({
   selector: 'app-booking-details',

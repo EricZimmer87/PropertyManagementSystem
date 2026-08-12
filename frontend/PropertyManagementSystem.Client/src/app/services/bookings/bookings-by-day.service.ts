@@ -1,7 +1,7 @@
 import { Service, Signal, inject } from '@angular/core';
 import { httpResource } from '@angular/common/http';
-import { BookingsByDayResponse } from './bookings-by-day-response.type';
-import { BookingByDay } from './booking-by-day.type';
+import { BookingsByDayResponse } from '../../types/bookings/bookings-by-day-response.type';
+import { BookingByDay } from '../../types/bookings/booking-by-day.type';
 
 @Service()
 export class BookingsByDayService {

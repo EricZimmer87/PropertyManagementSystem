@@ -1,8 +1,8 @@
 import { Service, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse, httpResource } from '@angular/common/http';
-import { LoginRequest } from '../auth/login/login-request.type';
+import { LoginRequest } from '../../auth/login/login-request.type';
 import { catchError, throwError, Observable, of, tap, map, shareReplay } from 'rxjs';
-import { IsAuthenticated } from '../shared/types/is-authenticated-.type';
+import { IsAuthenticated } from '../../types/auth/is-authenticated-.type';
 
 export type CurrentUser = {
   userName: string;

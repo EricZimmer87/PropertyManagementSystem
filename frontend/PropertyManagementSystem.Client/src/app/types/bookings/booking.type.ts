@@ -1,6 +1,6 @@
-import { BookingStatus } from '../enums/booking-status.enum';
+import { BookingStatus } from '../../enums/booking-status.enum';
 
-export type BookingDetailsResponse = {
+export type Booking = {
   bookingId: number;
   guestName: string;
   unitNumber: string;

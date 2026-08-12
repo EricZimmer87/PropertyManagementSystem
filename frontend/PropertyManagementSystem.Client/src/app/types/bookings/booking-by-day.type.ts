@@ -1,4 +1,4 @@
-import { BookingStatus } from '../../shared/enums/booking-status.enum';
+import { BookingStatus } from '../../enums/booking-status.enum';
 
 export type BookingByDay = {
   bookingId: number | null;

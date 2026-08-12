@@ -1,10 +1,10 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { BookingsByDayService } from './bookings-by-day.service';
+import { BookingsByDayService } from '../../services/bookings/bookings-by-day.service';
 import { DatePipe } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { BookingStatusLabelPipe } from '../../shared/pipes/booking-status-label.pipe';
-import { BookingStatus } from '../../shared/enums/booking-status.enum';
+import { BookingStatusLabelPipe } from '../../pipes/booking-status-label.pipe';
+import { BookingStatus } from '../../enums/booking-status.enum';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({

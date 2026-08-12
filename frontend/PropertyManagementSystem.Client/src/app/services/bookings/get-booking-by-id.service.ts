@@ -1,6 +1,6 @@
 import { Service, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BookingDetailsResponse } from '../types/booking-details-response.type';
+import { BookingDetailsResponse } from '../../types/bookings/booking-details-response.type';
 import { catchError, Observable, throwError } from 'rxjs';
 
 @Service()

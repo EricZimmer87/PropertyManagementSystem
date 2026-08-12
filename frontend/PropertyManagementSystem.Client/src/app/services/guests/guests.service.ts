@@ -1,6 +1,6 @@
 import { httpResource, HttpResourceRef } from '@angular/common/http';
 import { Service, Signal } from '@angular/core';
-import { GuestsResponse } from './guests-response.type';
+import { GuestsResponse } from '../../types/guests/guests-response.type';
 
 @Service()
 export class GuestsService {

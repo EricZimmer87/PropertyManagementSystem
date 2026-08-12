@@ -1,7 +1,6 @@
 import { httpResource, HttpResourceRef } from '@angular/common/http';
 import { Service, Signal } from '@angular/core';
-import { BookingsResponse } from './bookings-response.type';
-import und from '@angular/common/locales/und';
+import { BookingsResponse } from '../../types/bookings/bookings-response.type';
 
 @Service()
 export class BookingsService {

@@ -1,17 +1,22 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
+import { BookingsService } from '../../services/bookings/bookings.service';
+import { Component, computed, inject, signal, effect, untracked } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { GuestsService } from './guests.service';
+import { BookingStatusLabelPipe } from '../../pipes/booking-status-label.pipe';
+import { BookingStatus } from '../../enums/booking-status.enum';
+import { HttpErrorResponse } from '@angular/common/http';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { setupDebouncedSearchNavigation } from '../../shared/utils/setup-debounced-search-navigation';
 
 @Component({
-  selector: 'app-guests',
-  imports: [RouterLink, ReactiveFormsModule],
-  templateUrl: './guests.html',
-  styleUrl: './guests.css',
+  selector: 'app-bookings',
+  imports: [DatePipe, RouterLink, BookingStatusLabelPipe, ReactiveFormsModule],
+  templateUrl: './bookings.html',
+  styleUrl: './bookings.css',
 })
-export class Guests {
-  private readonly guestsService = inject(GuestsService);
+export class Bookings {
+  public readonly BookingStatus = BookingStatus;
+  private readonly bookingsService = inject(BookingsService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -30,31 +35,31 @@ export class Guests {
 
   public readonly dropdownOpen = signal(false);
 
-  readonly guestsResource = this.guestsService.getGuests(
+  readonly bookingsResource = this.bookingsService.getBookings(
     this.pageSize,
     this.pageNumber,
     this.search,
   );
 
-  readonly guests = computed(() =>
-    this.guestsResource.hasValue() ? this.guestsResource.value().items : [],
+  readonly bookings = computed(() =>
+    this.bookingsResource.hasValue() ? this.bookingsResource.value().items : [],
   );
 
   readonly pagination = computed(() => {
-    if (!this.guestsResource.hasValue()) {
+    if (!this.bookingsResource.hasValue()) {
       return null;
     }
 
     const { pageNumber, pageSize, totalCount, totalPages, hasNextPage, hasPreviousPage } =
-      this.guestsResource.value();
+      this.bookingsResource.value();
 
     return { pageNumber, pageSize, totalCount, totalPages, hasNextPage, hasPreviousPage };
   });
 
-  readonly isLoading = this.guestsResource.isLoading;
+  readonly isLoading = this.bookingsResource.isLoading;
 
   readonly errorMessage = computed(() => {
-    const error = this.guestsResource.error();
+    const error = this.bookingsResource.error();
 
     if (error instanceof HttpErrorResponse) {
       return error.error?.message ?? error.message;
@@ -64,22 +69,7 @@ export class Guests {
   });
 
   constructor() {
-    // Debounce: wait 300ms after the user stops typing
-    // before updating the signal and navigating
-    let timeout: ReturnType<typeof setTimeout>;
-    effect(() => {
-      const value = this.search();
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        untracked(() => {
-          this.router.navigate([], {
-            relativeTo: this.activatedRoute,
-            queryParams: { search: value || null },
-            queryParamsHandling: 'merge',
-          });
-        });
-      }, 300);
-    });
+    setupDebouncedSearchNavigation(this.search);
   }
 
   searchSubmit() {

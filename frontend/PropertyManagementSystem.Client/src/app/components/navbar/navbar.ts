@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { AuthService } from '../../core/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({

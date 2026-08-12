@@ -2,8 +2,8 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { LoginRequest } from './login-request.type';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../core/auth.service';
-import { toFriendlyError } from '../../shared/error-messages.ts/to-friendly-error';
+import { AuthService } from '../../services/auth/auth.service';
+import { toFriendlyError } from '../../error-messages.ts/to-friendly-error';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({

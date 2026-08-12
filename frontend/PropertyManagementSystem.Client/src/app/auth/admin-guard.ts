@@ -1,8 +1,8 @@
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../core/auth.service';
+import { AuthService } from '../services/auth/auth.service';
 import { inject } from '@angular/core';
 import { catchError, map, of } from 'rxjs';
-import { Roles } from '../shared/enums/roles.enum';
+import { Roles } from '../enums/roles.enum';
 
 export const adminGuard: CanActivateFn = () => {
   const auth = inject(AuthService);

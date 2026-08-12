@@ -1,21 +1,18 @@
-import { DatePipe } from '@angular/common';
-import { BookingsService } from './bookings.service';
-import { Component, computed, inject, signal, effect, untracked } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { BookingStatusLabelPipe } from '../../shared/pipes/booking-status-label.pipe';
-import { BookingStatus } from '../../shared/enums/booking-status.enum';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { GuestsService } from '../../services/guests/guests.service';
+import { setupDebouncedSearchNavigation } from '../../shared/utils/setup-debounced-search-navigation';
 
 @Component({
-  selector: 'app-bookings',
-  imports: [DatePipe, RouterLink, BookingStatusLabelPipe, ReactiveFormsModule],
-  templateUrl: './bookings.html',
-  styleUrl: './bookings.css',
+  selector: 'app-guests',
+  imports: [RouterLink, ReactiveFormsModule],
+  templateUrl: './guests.html',
+  styleUrl: './guests.css',
 })
-export class Bookings {
-  public readonly BookingStatus = BookingStatus;
-  private readonly bookingsService = inject(BookingsService);
+export class Guests {
+  private readonly guestsService = inject(GuestsService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -34,31 +31,31 @@ export class Bookings {
 
   public readonly dropdownOpen = signal(false);
 
-  readonly bookingsResource = this.bookingsService.getBookings(
+  readonly guestsResource = this.guestsService.getGuests(
     this.pageSize,
     this.pageNumber,
     this.search,
   );
 
-  readonly bookings = computed(() =>
-    this.bookingsResource.hasValue() ? this.bookingsResource.value().items : [],
+  readonly guests = computed(() =>
+    this.guestsResource.hasValue() ? this.guestsResource.value().items : [],
   );
 
   readonly pagination = computed(() => {
-    if (!this.bookingsResource.hasValue()) {
+    if (!this.guestsResource.hasValue()) {
       return null;
     }
 
     const { pageNumber, pageSize, totalCount, totalPages, hasNextPage, hasPreviousPage } =
-      this.bookingsResource.value();
+      this.guestsResource.value();
 
     return { pageNumber, pageSize, totalCount, totalPages, hasNextPage, hasPreviousPage };
   });
 
-  readonly isLoading = this.bookingsResource.isLoading;
+  readonly isLoading = this.guestsResource.isLoading;
 
   readonly errorMessage = computed(() => {
-    const error = this.bookingsResource.error();
+    const error = this.guestsResource.error();
 
     if (error instanceof HttpErrorResponse) {
       return error.error?.message ?? error.message;
@@ -68,22 +65,25 @@ export class Bookings {
   });
 
   constructor() {
+    setupDebouncedSearchNavigation(this.search);
     // Debounce: wait 300ms after the user stops typing
     // before updating the signal and navigating
-    let timeout: ReturnType<typeof setTimeout>;
-    effect(() => {
-      const value = this.search();
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        untracked(() => {
-          this.router.navigate([], {
-            relativeTo: this.activatedRoute,
-            queryParams: { search: value || null },
-            queryParamsHandling: 'merge',
-          });
-        });
-      }, 300);
-    });
+    // let timeout: ReturnType<typeof setTimeout>;
+    // effect(() => {
+    //   const value = this.search();
+    //   clearTimeout(timeout);
+    //   timeout = setTimeout(() => {
+    //     untracked(() => {
+    //       this.router.navigate([], {
+    //         relativeTo: this.activatedRoute,
+    //         queryParams: { search: value || null },
+    //         queryParamsHandling: 'merge',
+    //       });
+    //     });
+    //   }, 300);
+    //
+    //   return () => clearTimeout(timeout);
+    // });
   }
 
   searchSubmit() {

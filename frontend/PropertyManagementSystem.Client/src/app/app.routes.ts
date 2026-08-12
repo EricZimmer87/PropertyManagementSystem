@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
 import { Login } from './auth/login/login';
-import { Bookings } from './features/bookings/bookings';
-import { BookingsByDay } from './features/bookings-by-day/bookings-by-day';
-import { Forbidden } from './shared/components/forbidden/forbidden';
+import { Bookings } from './components/bookings/bookings';
+import { BookingsByDay } from './components/bookings-by-day/bookings-by-day';
+import { Forbidden } from './components/forbidden/forbidden';
 import { authGuard } from './auth/auth-guard';
 import { adminGuard } from './auth/admin-guard';
-import { BookingDetails } from './features/booking-details/booking-details';
-import { Guests } from './features/guests/guests';
-import { GuestDetails } from './features/guest-details.ts/guest-details';
+import { BookingDetails } from './components/booking-details/booking-details';
+import { Guests } from './components/guests/guests';
+import { GuestDetails } from './components/guest-details.ts/guest-details';
 
 export const routes: Routes = [
   {
