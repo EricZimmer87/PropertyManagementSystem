@@ -2,13 +2,13 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { UnitsService } from '../../../services/units/units.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { setupDebouncedSearchNavigation } from '../../../shared/utils/setup-debounced-search-navigation';
-import { GuestsService } from '../../../services/guests/guests.service';
+import { Pagination } from '../../pagination/pagination/pagination';
 
 @Component({
   selector: 'app-units',
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, ReactiveFormsModule, Pagination],
   templateUrl: './units.html',
   styleUrl: './units.css',
 })
@@ -16,10 +16,6 @@ export class Units {
   private readonly unitsService = inject(UnitsService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
-
-  searchForm = new FormGroup({
-    search: new FormControl<string | null>(null),
-  });
 
   // Read initial values from query params, fall back to defaults
   public readonly pageNumber = signal(
@@ -30,8 +26,6 @@ export class Units {
   );
   public readonly search = signal(this.activatedRoute.snapshot.queryParamMap.get('search') ?? '');
   public readonly sort = signal(this.activatedRoute.snapshot.queryParamMap.get('sort') ?? '');
-
-  public readonly dropdownOpen = signal(false);
 
   readonly unitsResource = this.unitsService.getUnits(
     this.pageSize,
@@ -71,32 +65,13 @@ export class Units {
     setupDebouncedSearchNavigation(this.search);
   }
 
-  searchSubmit() {
-    const searchString = this.searchForm.value.search;
-
-    if (
-      searchString === '' ||
-      searchString === null ||
-      searchString === undefined ||
-      searchString === this.search()
-    ) {
-      this.search.set('');
-    } else {
-      this.search.set(searchString);
-    }
-  }
-
   onSearchInput(value: string): void {
     this.search.set(value);
   }
 
-  pagesArray(totalPages: number | null): number[] {
-    if (!totalPages || totalPages <= 0) return [];
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
-  }
-
   changePage(page: number): void {
     this.pageNumber.set(page);
+    // Keep this reroute so going back in the browser goes back to the same values
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
       queryParams: { page, size: this.pageSize(), search: this.search() || null },
@@ -107,11 +82,11 @@ export class Units {
   changePageSize(size: number): void {
     this.pageSize.set(size);
     this.pageNumber.set(1);
+    // Keep this reroute so going back in the browser goes back to the same values
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
       queryParams: { page: 1, size, search: this.search() || null },
       queryParamsHandling: 'merge',
     });
-    this.dropdownOpen.set(false);
   }
 }

@@ -1,1 +1,47 @@
-<p>pagination works!</p>
+<nav aria-label="Page navigation">
+  <!-- Page buttons -->
+  <ul class="pagination">
+    <li class="page-item" [class.disabled]="!hasPreviousPage()">
+      <button class="page-link" (click)="pageChange.emit(currentPage() - 1)">Prev</button>
+    </li>
+
+    @for (page of visiblePages(); track page) {
+      @if (page === '...') {
+        <li class="page-item disabled">
+          <span class="page-link">...</span>
+        </li>
+      } @else {
+        <li class="page-item" [class.active]="page === currentPage()">
+          <button class="page-link" (click)="pageChange.emit(page)">{{ page }}</button>
+        </li>
+      }
+    }
+
+    <li class="page-item" [class.disabled]="!hasNextPage()">
+      <button class="page-link" (click)="pageChange.emit(currentPage() + 1)">Next</button>
+    </li>
+  </ul>
+
+  <!-- Page size dropdown -->
+  <div class="dropdown">
+    <button
+      class="btn btn-primary dropdown-toggle"
+      type="button"
+      (click)="toggleDropdown()"
+      [attr.aria-expanded]="dropdownOpen()">
+      {{ pageSize() }} per page
+    </button>
+    <ul class="dropdown-menu" [class.show]="dropdownOpen()">
+      @for (size of pageSizes; track size) {
+        <li>
+          <button
+            class="dropdown-item"
+            [class.active]="size === pageSize()"
+            (click)="pageSizeChange.emit(size)">
+            {{ size }}
+          </button>
+        </li>
+      }
+    </ul>
+  </div>
+</nav>
