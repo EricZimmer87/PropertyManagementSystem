@@ -1,1 +1,33 @@
-<p>guest-details.ts works!</p>
+<h1 class="mb-3">Guest Details</h1>
+
+<dl class="row">
+  <dt class="col-sm-1">First Name</dt>
+  <dd class="col-sm-11">{{ guest()?.firstName ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Last Name</dt>
+  <dd class="col-sm-11">{{ guest()?.lastName ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Phone Number</dt>
+  <dd class="col-sm-11">{{ guest()?.phoneNumber ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Address</dt>
+  <dd class="col-sm-11">{{ guest()?.address ?? '-' }}</dd>
+
+  <dt class="col-sm-1">City</dt>
+  <dd class="col-sm-11">{{ guest()?.city ?? '-' }}</dd>
+
+  <dt class="col-sm-1">State</dt>
+  <dd class="col-sm-11">{{ guest()?.state ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Zip Code</dt>
+  <dd class="col-sm-11">{{ guest()?.zipCode ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Email</dt>
+  <dd class="col-sm-11">{{ guest()?.email ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Company</dt>
+  <dd class="col-sm-11">{{ guest()?.company ?? '-' }}</dd>
+
+  <dt class="col-sm-1">Notes</dt>
+  <dd class="col-sm-11">{{ guest()?.notes ?? '-' }}</dd>
+</dl>
