@@ -1,24 +1,24 @@
-import { httpResource, HttpResourceRef } from '@angular/common/http';
 import { Service, Signal } from '@angular/core';
-import { GuestsResponse } from '../../types/guests/guests-response.type';
+import { UnitsResponse } from '../../types/units/units-response.type';
+import { httpResource, HttpResourceRef } from '@angular/common/http';
 
 @Service()
-export class GuestsService {
-  url = '/api/guests';
+export class UnitsService {
+  url = '/api/units';
 
-  getGuests(
+  getUnits(
     pageSize: Signal<number | undefined>,
     pageNumber: Signal<number | undefined>,
     search: Signal<string>,
     sort: Signal<string>,
-  ): HttpResourceRef<GuestsResponse | undefined> {
-    return httpResource<GuestsResponse>(() => ({
+  ): HttpResourceRef<UnitsResponse | undefined> {
+    return httpResource<UnitsResponse>(() => ({
       url: this.url,
       params: {
         pageSize: pageSize() ?? 10,
         pageNumber: pageNumber() ?? 1,
         search: search(),
-        sort: sort(),
+        sort: sort()
       },
     }));
   }

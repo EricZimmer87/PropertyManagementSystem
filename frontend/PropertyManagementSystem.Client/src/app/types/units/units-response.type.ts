@@ -1,11 +1,11 @@
-import { Guest } from './guest.type';
+import { Unit } from './unit.type';
 
-export type GuestsResponse = {
+export type UnitsResponse = {
   pageNumber: number;
   pageSize: number;
   totalCount: number;
   totalPages: number;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
-  items: Guest[];
-};
+  items: Unit[];
+}

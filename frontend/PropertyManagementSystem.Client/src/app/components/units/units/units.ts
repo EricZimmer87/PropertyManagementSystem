@@ -1,18 +1,19 @@
+import { Component, computed, inject, signal } from '@angular/core';
+import { UnitsService } from '../../../services/units/units.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { GuestsService } from '../../services/guests/guests.service';
-import { setupDebouncedSearchNavigation } from '../../shared/utils/setup-debounced-search-navigation';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { setupDebouncedSearchNavigation } from '../../../shared/utils/setup-debounced-search-navigation';
+import { GuestsService } from '../../../services/guests/guests.service';
 
 @Component({
-  selector: 'app-guests',
+  selector: 'app-units',
   imports: [RouterLink, ReactiveFormsModule],
-  templateUrl: './guests.html',
-  styleUrl: './guests.css',
+  templateUrl: './units.html',
+  styleUrl: './units.css',
 })
-export class Guests {
-  private readonly guestsService = inject(GuestsService);
+export class Units {
+  private readonly unitsService = inject(UnitsService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -32,32 +33,32 @@ export class Guests {
 
   public readonly dropdownOpen = signal(false);
 
-  readonly guestsResource = this.guestsService.getGuests(
+  readonly unitsResource = this.unitsService.getUnits(
     this.pageSize,
     this.pageNumber,
     this.search,
     this.sort,
   );
 
-  readonly guests = computed(() =>
-    this.guestsResource.hasValue() ? this.guestsResource.value().items : [],
+  readonly units = computed(() =>
+    this.unitsResource.hasValue() ? this.unitsResource.value().items : [],
   );
 
   readonly pagination = computed(() => {
-    if (!this.guestsResource.hasValue()) {
+    if (!this.unitsResource.hasValue()) {
       return null;
     }
 
     const { pageNumber, pageSize, totalCount, totalPages, hasNextPage, hasPreviousPage } =
-      this.guestsResource.value();
+      this.unitsResource.value();
 
     return { pageNumber, pageSize, totalCount, totalPages, hasNextPage, hasPreviousPage };
   });
 
-  readonly isLoading = this.guestsResource.isLoading;
+  readonly isLoading = this.unitsResource.isLoading;
 
   readonly errorMessage = computed(() => {
-    const error = this.guestsResource.error();
+    const error = this.unitsResource.error();
 
     if (error instanceof HttpErrorResponse) {
       return error.error?.message ?? error.message;

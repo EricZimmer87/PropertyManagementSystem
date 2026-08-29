@@ -9,6 +9,7 @@ using PropertyManagement.Api.Seeding;
 using PropertyManagement.Api.Services.Bookings;
 using PropertyManagement.Api.Services.Email;
 using PropertyManagement.Api.Services.Guests;
+using PropertyManagement.Api.Services.Units;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -118,6 +119,8 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IGuestService, GuestService>();
 // Booking Service
 builder.Services.AddScoped<IBookingService, BookingService>();
+// Unit Service
+builder.Services.AddScoped<IUnitService, UnitService>();
 
 var app = builder.Build();
 

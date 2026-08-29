@@ -5,6 +5,7 @@ using PropertyManagement.Api.Common;
 using PropertyManagement.Api.Data;
 using PropertyManagement.Api.DTOs.Units;
 using PropertyManagement.Api.Models;
+using PropertyManagement.Api.Services.Units;
 
 namespace PropertyManagement.Api.Controllers
 {
@@ -14,16 +15,23 @@ namespace PropertyManagement.Api.Controllers
     public class UnitsController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IUnitService _unitService;
 
-        public UnitsController(AppDbContext context)
+        public UnitsController(AppDbContext context, IUnitService unitService)
         {
             _context = context;
+            _unitService = unitService;
         }
 
         // GET api/units - gets all units
         [HttpGet]
-        public async Task<ActionResult<List<UnitResponse>>> GetUnits([FromQuery] QueryFilter filter)
+        public async Task<ActionResult<List<UnitResponse>>> GetUnits(
+            [FromQuery] QueryFilter filter,
+            CancellationToken cancellationToken)
         {
+            var result = await _unitService.GetAllUnitsAsync(filter, cancellationToken);
+            return Ok(result);
+
             var units = await _context.Units
                 .AsNoTracking()
                 .ApplySort(filter.SortBy ?? "UnitNumber")

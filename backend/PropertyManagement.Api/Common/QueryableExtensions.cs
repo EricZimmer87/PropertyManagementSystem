@@ -198,5 +198,25 @@ namespace PropertyManagement.Api.Common
 
             return query;
         }
+
+        // Unit search
+        public static IQueryable<Unit> ApplySearch(this IQueryable<Unit> query, string? search)
+        {
+            if (string.IsNullOrWhiteSpace(search))
+                return query;
+
+            search = search.Trim();
+            var like = $"%{search}%";
+            var normalizedSearch = NormalizePhoneNumber(search);
+            var normalizedLike = $"%{normalizedSearch}%";
+
+            query = query.Where(u =>
+                EF.Functions.Like(u.UnitNumber, like) ||
+                EF.Functions.Like(u.UnitType, like) ||
+                EF.Functions.Like(u.Notes, like)
+            );
+
+            return query;
+        }
     }
 }

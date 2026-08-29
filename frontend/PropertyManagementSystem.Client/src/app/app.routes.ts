@@ -8,6 +8,8 @@ import { adminGuard } from './auth/admin-guard';
 import { BookingDetails } from './components/booking-details/booking-details';
 import { Guests } from './components/guests/guests';
 import { GuestDetails } from './components/guest-details.ts/guest-details';
+import { Units } from './components/units/units/units';
+import { UnitDetails } from './components/unit-details/unit-details';
 
 export const routes: Routes = [
   {
@@ -48,6 +50,18 @@ export const routes: Routes = [
     path: 'guests/:id',
     component: GuestDetails,
     title: 'Guest Details',
+    canMatch: [authGuard],
+  },
+  {
+    path: 'units',
+    component: Units,
+    title: 'Units',
+    canMatch: [authGuard],
+  },
+  {
+    path: 'units/:id',
+    component: UnitDetails,
+    title: 'Unit Details',
     canMatch: [authGuard],
   },
 ];
