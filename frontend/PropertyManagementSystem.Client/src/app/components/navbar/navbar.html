@@ -15,6 +15,11 @@
       <li class="nav-item">
         <a class="nav-link" routerLinkActive="active" [routerLink]="['/units']">Units</a>
       </li>
+      @if (authService.isAdmin$ | async) {
+        <li class="nav-item">
+          <a class="nav-link" routerLinkActive="active" [routerLink]="['/users']">Users</a>
+        </li>
+      }
     </ul>
 
     <ul class="nav nav-pills ms-auto">

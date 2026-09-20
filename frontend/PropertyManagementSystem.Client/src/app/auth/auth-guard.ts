@@ -10,14 +10,9 @@ export const authGuard: CanActivateFn = () => {
   if (auth.isLoggedIn()) return of(true);
 
   return auth.loadMe().pipe(
-    map((user) => {
-      if (user) return true;
-      router.navigate(['/'], { queryParams: { error: 'not_logged_in' } });
-      return false;
-    }),
-    catchError(() => {
-      router.navigate(['/'], { queryParams: { error: 'auth_failed' } });
-      return of(false);
-    }),
+    map((user) =>
+      user ? true : router.createUrlTree(['/'], { queryParams: { error: 'not_logged_in' } }),
+    ),
+    catchError(() => of(router.createUrlTree(['/'], { queryParams: { error: 'auth_failed' } }))),
   );
 };

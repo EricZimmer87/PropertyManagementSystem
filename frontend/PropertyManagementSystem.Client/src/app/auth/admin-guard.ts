@@ -10,21 +10,18 @@ export const adminGuard: CanActivateFn = () => {
 
   // If already loaded, decide immediately
   if (auth.isLoggedIn()) {
-    if (auth.hasRole(Roles.Admin)) return of(true);
-    router.navigate(['/forbidden'], { queryParams: { error: 'forbidden' } });
-    return of(false);
+    return auth.hasRole(Roles.Admin)
+      ? of(true)
+      : of(router.createUrlTree(['/forbidden'], { queryParams: { error: 'forbidden' } }));
   }
 
-  // Otherwise load /api/auth/me and decide
   return auth.loadMe().pipe(
     map((user) => {
-      const ok = !!user && user.roles.includes(Roles.Admin);
-      if (!ok) router.navigate(['/forbidden'], { queryParams: { error: 'forbidden' } });
-      return ok;
+      if (user?.roles.includes(Roles.Admin)) {
+        return true;
+      }
+      return router.createUrlTree(['/forbidden'], { queryParams: { error: 'forbidden' } });
     }),
-    catchError(() => {
-      router.navigate(['/'], { queryParams: { error: 'auth_failed' } });
-      return of(false);
-    }),
+    catchError(() => of(router.createUrlTree(['/'], { queryParams: { error: 'auth_failed' } }))),
   );
 };

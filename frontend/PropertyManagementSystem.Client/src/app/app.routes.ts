@@ -10,6 +10,7 @@ import { Guests } from './components/guests/guests';
 import { GuestDetails } from './components/guest-details.ts/guest-details';
 import { Units } from './components/units/units/units';
 import { UnitDetails } from './components/unit-details/unit-details';
+import { Users } from './components/users/users/users';
 
 export const routes: Routes = [
   {
@@ -63,5 +64,11 @@ export const routes: Routes = [
     component: UnitDetails,
     title: 'Unit Details',
     canMatch: [authGuard],
+  },
+  {
+    path: 'users',
+    component: Users,
+    title: 'Users',
+    canMatch: [adminGuard],
   },
 ];

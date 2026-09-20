@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse, httpResource } from '@angular/common/htt
 import { LoginRequest } from '../../auth/login/login-request.type';
 import { catchError, throwError, Observable, of, tap, map, shareReplay } from 'rxjs';
 import { IsAuthenticated } from '../../types/auth/is-authenticated-.type';
+import { Roles } from '../../enums/roles.enum';
 
 export type CurrentUser = {
   userName: string;
@@ -47,12 +48,21 @@ export class AuthService {
     this.me$ = this.http.get<CurrentUser>(this.meUrl).pipe(
       tap((u) => (this.user = u)),
       map((u) => u ?? null),
-      catchError(() => of(null)),
+      catchError(() => {
+        this.user = null;
+        return of(null);
+      }),
       shareReplay(1),
     );
 
     return this.me$;
   }
+
+  readonly currentUser$ = this.loadMe();
+
+  readonly isAdmin$ = this.currentUser$.pipe(
+    map((user) => user?.roles.includes(Roles.Admin) ?? false),
+  );
 
   // Only works if loadMe() has been called - use in Auth & Admin Guards
   isLoggedIn(): boolean {

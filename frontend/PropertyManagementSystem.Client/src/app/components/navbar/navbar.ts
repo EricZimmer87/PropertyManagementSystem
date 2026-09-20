@@ -1,15 +1,16 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [AsyncPipe, RouterLinkActive, RouterLink],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
 export class Navbar {
-  private readonly authService = inject(AuthService);
+  protected readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   errorMessage = signal<string | null>(null);
