@@ -23,6 +23,7 @@ export class AuthService {
   readonly currentUser = this.currentUserSignal.asReadonly();
   readonly isAdmin = computed(() => this.currentUserSignal()?.roles.includes(Roles.Admin) ?? false);
 
+  // This is called when the app initializes to avoid signals being reset when user refreshes the page
   loadCurrentUser(): Observable<CurrentUser | null> {
     return this.http.get<CurrentUser>(this.meUrl).pipe(
       tap((user) => {
