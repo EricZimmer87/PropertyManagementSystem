@@ -33,6 +33,7 @@ export class AuthService {
         this.currentUserSignal.set(null);
         return of(null);
       }),
+      shareReplay(1)
     );
   }
 
