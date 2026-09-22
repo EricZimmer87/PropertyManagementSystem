@@ -1,4 +1,4 @@
-import { Service, inject } from '@angular/core';
+import { Service, inject, signal, computed } from '@angular/core';
 import { HttpClient, HttpErrorResponse, httpResource } from '@angular/common/http';
 import { LoginRequest } from '../../auth/login/login-request.type';
 import { catchError, throwError, Observable, of, tap, map, shareReplay } from 'rxjs';
@@ -19,68 +19,44 @@ export class AuthService {
   sessionUrl = '/api/auth/session';
   meUrl = '/api/auth/me';
 
-  private user: CurrentUser | null = null;
-  private me$?: Observable<CurrentUser | null>;
+  private currentUserSignal = signal<CurrentUser | null>(null);
+  readonly currentUser = this.currentUserSignal.asReadonly();
+  readonly isAdmin = computed(() => this.currentUserSignal()?.roles.includes(Roles.Admin) ?? false);
 
-  login(request: LoginRequest) {
-    return this.http.post<void>(this.loginUrl, request).pipe(
-      catchError((err: HttpErrorResponse) => {
-        const backendMessage = typeof err.error === 'string' ? err.error : err.error?.message;
-
-        return throwError(() => new Error(backendMessage || 'Login failed.'));
+  loadCurrentUser(): Observable<CurrentUser | null> {
+    return this.http.get<CurrentUser>(this.meUrl).pipe(
+      tap((user) => {
+        this.currentUserSignal.set(user);
+      }),
+      catchError(() => {
+        this.currentUserSignal.set(null);
+        return of(null);
       }),
     );
   }
 
-  logout() {
+  login(request: LoginRequest): Observable<CurrentUser | null> {
+    return this.http.post<CurrentUser>(this.loginUrl, request).pipe(
+      tap((user) => {
+        this.currentUserSignal.set(user);
+      }),
+      catchError(() => {
+        this.currentUserSignal.set(null);
+        return of(null);
+      }),
+    );
+  }
+
+  logout(): Observable<void> {
     return this.http.delete<void>(this.logoutUrl).pipe(
+      tap(() => {
+        this.currentUserSignal.set(null);
+      }),
       catchError((err: HttpErrorResponse) => {
         const backendMessage = typeof err.error === 'string' ? err.error : err.error?.message;
 
         return throwError(() => new Error(backendMessage || 'Logout failed.'));
       }),
     );
-  }
-
-  loadMe(): Observable<CurrentUser | null> {
-    if (this.me$) return this.me$;
-
-    this.me$ = this.http.get<CurrentUser>(this.meUrl).pipe(
-      tap((u) => (this.user = u)),
-      map((u) => u ?? null),
-      catchError(() => {
-        this.user = null;
-        return of(null);
-      }),
-      shareReplay(1),
-    );
-
-    return this.me$;
-  }
-
-  readonly currentUser$ = this.loadMe();
-
-  readonly isAdmin$ = this.currentUser$.pipe(
-    map((user) => user?.roles.includes(Roles.Admin) ?? false),
-  );
-
-  // Only works if loadMe() has been called - use in Auth & Admin Guards
-  isLoggedIn(): boolean {
-    return !!this.user;
-  }
-
-  // Used to check if there is a session to see if there is a user that is logged in/authenticated
-  private sessionResource = httpResource<IsAuthenticated>(() => ({
-    url: this.sessionUrl,
-  }));
-  isSession() {
-    return this.sessionResource;
-  }
-  refreshSession() {
-    this.sessionResource.reload();
-  }
-
-  hasRole(role: string): boolean {
-    return this.user?.roles?.includes(role) ?? false;
   }
 }

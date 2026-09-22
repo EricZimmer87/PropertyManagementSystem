@@ -5,7 +5,7 @@ import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
-  imports: [AsyncPipe, RouterLinkActive, RouterLink],
+  imports: [RouterLinkActive, RouterLink],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
@@ -13,28 +13,18 @@ export class Navbar {
   protected readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  errorMessage = signal<string | null>(null);
-
-  readonly isLoggedInResource = this.authService.isSession();
-
-  readonly isLoggedIn = computed(() =>
-    this.isLoggedInResource.hasValue() ? this.isLoggedInResource.value().isAuthenticated : null,
-  );
+  errorMessage = '';
 
   logout() {
-    this.errorMessage.set(null);
+    this.errorMessage = '';
 
-    this.authService
-      .logout()
-      .pipe()
-      .subscribe({
-        next: () => {
-          this.authService.refreshSession();
-          this.router.navigate(['/']);
-        },
-        error: (err) => {
-          this.errorMessage.set(err.message || 'Logout failed.');
-        },
-      });
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        this.errorMessage = err.message || 'Logout failed.';
+      },
+    });
   }
 }

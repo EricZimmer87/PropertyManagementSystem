@@ -31,20 +31,6 @@ namespace PropertyManagement.Api.Controllers
         {
             var result = await _unitService.GetAllUnitsAsync(filter, cancellationToken);
             return Ok(result);
-
-            var units = await _context.Units
-                .AsNoTracking()
-                .ApplySort(filter.SortBy ?? "UnitNumber")
-                .Select(u => new UnitResponse
-                {
-                    UnitId = u.UnitId,
-                    UnitNumber = u.UnitNumber,
-                    UnitType = u.UnitType,
-                    Notes = u.Notes ?? "-"
-                })
-                .ToListAsync();
-
-            return Ok(units);
         }
 
         // GET api/units/{id} - gets a unit by id

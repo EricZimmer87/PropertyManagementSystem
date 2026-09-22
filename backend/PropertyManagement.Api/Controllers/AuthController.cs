@@ -47,10 +47,10 @@ namespace PropertyManagement.Api.Controllers
             
             var roles = await _userManager.GetRolesAsync(user);
 
-            return Ok(new
+            return Ok(new LoginResponse
             {
-                userName = user.UserName,
-                roles
+                Username = user.UserName ?? string.Empty,
+                Roles = roles
             });
         }
 
@@ -223,8 +223,14 @@ namespace PropertyManagement.Api.Controllers
 
             _logger.LogInformation("User {Email} logged in at {Time}.",
                 user.Email, DateTime.UtcNow);
-
-            return NoContent();
+            
+            var roles = await _userManager.GetRolesAsync(user);
+            
+            return Ok(new LoginResponse
+            {
+                Username = user.UserName ?? string.Empty,
+                Roles = roles
+            });
         }
 
         // DELETE /api/auth/logout - logs the user out

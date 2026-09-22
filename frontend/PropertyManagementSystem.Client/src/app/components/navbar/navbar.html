@@ -1,9 +1,9 @@
-@if (isLoggedIn()) {
+@if (authService.currentUser()) {
   <nav class="navbar navbar-expand-sm bg-light mb-5">
     <ul class="nav nav-pills">
       <li class="nav-item">
         <a class="nav-link" routerLinkActive="active" [routerLink]="['/bookings-by-day']"
-          >Bookings By Day</a
+        >Bookings By Day</a
         >
       </li>
       <li class="nav-item">
@@ -15,7 +15,7 @@
       <li class="nav-item">
         <a class="nav-link" routerLinkActive="active" [routerLink]="['/units']">Units</a>
       </li>
-      @if (authService.isAdmin$ | async) {
+      @if (authService.isAdmin()) {
         <li class="nav-item">
           <a class="nav-link" routerLinkActive="active" [routerLink]="['/users']">Users</a>
         </li>
