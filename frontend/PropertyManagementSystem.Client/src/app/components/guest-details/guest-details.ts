@@ -5,7 +5,7 @@ import { GuestDetailsResponse } from '../../types/guests/guest-details-response.
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
-  selector: 'app-guest-details.ts',
+  selector: 'app-guest-details',
   imports: [],
   templateUrl: './guest-details.html',
   styleUrl: './guest-details.css',

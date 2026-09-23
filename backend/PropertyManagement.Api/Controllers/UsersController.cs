@@ -33,6 +33,29 @@ namespace PropertyManagement.Api.Controllers
             _context = context;
         }
 
+        // GET /api/users/{id} - gets user by id
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserResponse>> GetUserById(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            var userRole = await _userManager.GetRolesAsync(user);
+            var role = userRole.FirstOrDefault() ?? Roles.User;
+
+            return Ok(new UserResponse
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email ?? "",
+                IsActive = user.IsActive,
+                Role = role
+            });
+        }
+
         // GET /api/users - gets all users
         [Authorize(Roles = Roles.Admin)]
         [HttpGet]

@@ -1,16 +1,17 @@
 import { DatePipe } from '@angular/common';
 import { BookingsService } from '../../services/bookings/bookings.service';
-import { Component, computed, inject, signal, effect, untracked } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BookingStatusLabelPipe } from '../../pipes/booking-status-label.pipe';
 import { BookingStatus } from '../../enums/booking-status.enum';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { setupDebouncedSearchNavigation } from '../../shared/utils/setup-debounced-search-navigation';
+import { Pagination } from '../pagination/pagination/pagination';
 
 @Component({
   selector: 'app-bookings',
-  imports: [DatePipe, RouterLink, BookingStatusLabelPipe, ReactiveFormsModule],
+  imports: [DatePipe, RouterLink, BookingStatusLabelPipe, ReactiveFormsModule, Pagination],
   templateUrl: './bookings.html',
   styleUrl: './bookings.css',
 })
@@ -19,10 +20,6 @@ export class Bookings {
   private readonly bookingsService = inject(BookingsService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
-
-  searchForm = new FormGroup({
-    search: new FormControl<string | null>(null),
-  });
 
   // Read initial values from query params, fall back to defaults
   public readonly pageNumber = signal(
@@ -72,28 +69,8 @@ export class Bookings {
     setupDebouncedSearchNavigation(this.search);
   }
 
-  searchSubmit() {
-    const searchString = this.searchForm.value.search;
-
-    if (
-      searchString === '' ||
-      searchString === null ||
-      searchString === undefined ||
-      searchString === this.search()
-    ) {
-      this.search.set('');
-    } else {
-      this.search.set(searchString);
-    }
-  }
-
   onSearchInput(value: string): void {
     this.search.set(value);
-  }
-
-  pagesArray(totalPages: number | null): number[] {
-    if (!totalPages || totalPages <= 0) return [];
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
 
   changePage(page: number): void {

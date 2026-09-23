@@ -1,0 +1,22 @@
+<h1 class="mb-3">User Details</h1>
+
+<dl class="row">
+  <dt class="col-sm-1">User ID</dt>
+  <dd class="col-sm-11>">{{ user()?.id ?? '-'}}</dd>
+
+  <dt class="col-sm-1">First Name</dt>
+  <dd class="col-sm-11>">{{ user()?.firstName ?? '-'}}</dd>
+
+  <dt class="col-sm-1">Last Name</dt>
+  <dd class="col-sm-11>">{{ user()?.lastName ?? '-'}}</dd>
+
+  <dt class="col-sm-1">Email</dt>
+  <dd class="col-sm-11>">{{ user()?.email ?? '-'}}</dd>
+
+  <dt class="col-sm-1">Active?</dt>
+  <dd class="col-sm-11>">{{ user()?.isActive == true ? 'Yes' : 'No'}}</dd>
+
+  <dt class="col-sm-1">Role</dt>
+  <dd class="col-sm-11>">{{ user()?.role ?? '-'}}</dd>
+</dl>
+

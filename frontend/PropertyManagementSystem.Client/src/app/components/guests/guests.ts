@@ -4,10 +4,11 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { GuestsService } from '../../services/guests/guests.service';
 import { setupDebouncedSearchNavigation } from '../../shared/utils/setup-debounced-search-navigation';
+import { Pagination } from '../pagination/pagination/pagination';
 
 @Component({
   selector: 'app-guests',
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, ReactiveFormsModule, Pagination],
   templateUrl: './guests.html',
   styleUrl: './guests.css',
 })
@@ -70,28 +71,8 @@ export class Guests {
     setupDebouncedSearchNavigation(this.search);
   }
 
-  searchSubmit() {
-    const searchString = this.searchForm.value.search;
-
-    if (
-      searchString === '' ||
-      searchString === null ||
-      searchString === undefined ||
-      searchString === this.search()
-    ) {
-      this.search.set('');
-    } else {
-      this.search.set(searchString);
-    }
-  }
-
   onSearchInput(value: string): void {
     this.search.set(value);
-  }
-
-  pagesArray(totalPages: number | null): number[] {
-    if (!totalPages || totalPages <= 0) return [];
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
 
   changePage(page: number): void {

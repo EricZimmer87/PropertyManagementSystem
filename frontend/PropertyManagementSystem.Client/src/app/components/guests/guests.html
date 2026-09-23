@@ -54,63 +54,14 @@
     </tbody>
   </table>
 
-  <nav aria-label="Page navigation">
-    <ul class="pagination">
-      @if (pagination(); as p) {
-        <li class="page-item" [class.disabled]="!p.hasPreviousPage">
-          <a
-            class="page-link"
-            [class.text-muted]="!p.hasPreviousPage"
-            (click)="p.hasPreviousPage && changePage(p.pageNumber - 1)"
-          >
-            Previous
-          </a>
-        </li>
-
-        @for (page of pagesArray(p.totalPages); track page) {
-          <li class="page-item" [class.active]="page === p.pageNumber">
-            <a class="page-link" (click)="changePage(page)">{{ page }}</a>
-          </li>
-        }
-
-        <li class="page-item" [class.disabled]="!p.hasNextPage">
-          <a
-            class="page-link"
-            [class.text-muted]="!p.hasNextPage"
-            (click)="p.hasNextPage && changePage(p.pageNumber + 1)"
-          >
-            Next
-          </a>
-        </li>
-      }
-    </ul>
-
-    <div class="dropdown">
-      <button
-        class="btn btn-primary dropdown-toggle"
-        type="button"
-        [class.show]="dropdownOpen()"
-        (click)="dropdownOpen.set(!dropdownOpen())"
-      >
-        Page Size ({{ pageSize() }})
-      </button>
-      <ul class="dropdown-menu" [class.show]="dropdownOpen()">
-        <li>
-          <a class="dropdown-item" (click)="changePageSize(10)" [class.active]="pageSize() === 10"
-            >10</a
-          >
-        </li>
-        <li>
-          <a class="dropdown-item" (click)="changePageSize(25)" [class.active]="pageSize() === 25"
-            >25</a
-          >
-        </li>
-        <li>
-          <a class="dropdown-item" (click)="changePageSize(50)" [class.active]="pageSize() === 50"
-            >50</a
-          >
-        </li>
-      </ul>
-    </div>
-  </nav>
+  @if (pagination(); as p) {
+    <app-pagination
+      [currentPage]="p.pageNumber ?? 1"
+      [totalPages]="p.totalPages ?? 0"
+      [pageSize]="p.pageSize ?? 10"
+      [hasNextPage]="p.hasNextPage ?? false"
+      [hasPreviousPage]="p.hasPreviousPage ?? false"
+      (pageChange)="changePage($event)"
+      (pageSizeChange)="changePageSize($event)" />
+  }
 }

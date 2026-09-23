@@ -16,7 +16,6 @@ export class AuthService {
 
   loginUrl = '/api/auth/login';
   logoutUrl = '/api/auth/logout';
-  sessionUrl = '/api/auth/session';
   meUrl = '/api/auth/me';
 
   private currentUserSignal = signal<CurrentUser | null>(null);

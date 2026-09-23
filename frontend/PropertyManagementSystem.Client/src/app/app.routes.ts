@@ -7,10 +7,11 @@ import { authGuard } from './auth/auth-guard';
 import { adminGuard } from './auth/admin-guard';
 import { BookingDetails } from './components/booking-details/booking-details';
 import { Guests } from './components/guests/guests';
-import { GuestDetails } from './components/guest-details.ts/guest-details';
+import { GuestDetails } from './components/guest-details/guest-details';
 import { Units } from './components/units/units/units';
 import { UnitDetails } from './components/unit-details/unit-details';
 import { Users } from './components/users/users/users';
+import { UserDetails } from './components/user-details/user-details/user-details';
 
 export const routes: Routes = [
   {
@@ -69,6 +70,12 @@ export const routes: Routes = [
     path: 'users',
     component: Users,
     title: 'Users',
+    canMatch: [adminGuard],
+  },
+  {
+    path: 'users/:id',
+    component: UserDetails,
+    title: 'User Details',
     canMatch: [adminGuard],
   },
 ];
