@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using System.Runtime.Intrinsics.X86;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Api.Models;
 using PropertyManagement.Api.Services;
@@ -87,6 +88,13 @@ namespace PropertyManagement.Api.Data
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null
+                );
+
+            builder.Entity<AllowedEmail>()
+                .Property(ae => ae.CreatedAt)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
                 );
         }
 

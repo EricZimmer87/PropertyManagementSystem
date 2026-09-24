@@ -1,0 +1,12 @@
+<h1 class="mb-3">Allowed Email Details</h1>
+
+<dl class="row">
+  <dt class="col-sm-1">ID</dt>
+  <dd class="col-sm-11>">{{ allowedEmail()?.allowedEmailId}}</dd>
+
+  <dt class="col-sm-1">Email</dt>
+  <dd class="col-sm-11>">{{ allowedEmail()?.email}}</dd>
+
+  <dt class="col-sm-1">Created At</dt>
+  <dd class="col-sm-11>">{{ allowedEmail()?.createdAt | date: 'short'}}</dd>
+</dl>

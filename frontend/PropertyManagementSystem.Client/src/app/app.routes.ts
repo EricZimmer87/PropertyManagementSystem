@@ -12,6 +12,9 @@ import { Units } from './components/units/units/units';
 import { UnitDetails } from './components/unit-details/unit-details';
 import { Users } from './components/users/users/users';
 import { UserDetails } from './components/user-details/user-details/user-details';
+import { AllowedEmails } from './components/allowed-emails/allowed-emails/allowed-emails';
+import { AllowedEmailDetails } from './components/allowed-emails/allowed-email-details/allowed-email-details';
+import { AllowedEmailsEdit } from './components/allowed-emails/allowed-emails-edit/allowed-emails-edit';
 
 export const routes: Routes = [
   {
@@ -76,6 +79,24 @@ export const routes: Routes = [
     path: 'users/:id',
     component: UserDetails,
     title: 'User Details',
+    canMatch: [adminGuard],
+  },
+  {
+    path: 'allowed-emails',
+    component: AllowedEmails,
+    title: 'Allowed Emails',
+    canMatch: [adminGuard],
+  },
+  {
+    path: 'allowed-emails/:id',
+    component: AllowedEmailDetails,
+    title: 'Allowed Email Details',
+    canMatch: [adminGuard],
+  },
+  {
+    path: 'allowed-emails/edit/:id',
+    component: AllowedEmailsEdit,
+    title: 'Edit Allowed Email',
     canMatch: [adminGuard],
   },
 ];

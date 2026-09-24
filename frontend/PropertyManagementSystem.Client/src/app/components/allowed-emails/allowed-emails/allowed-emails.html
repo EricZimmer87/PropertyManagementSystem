@@ -1,1 +1,57 @@
-<p>allowed-emails works!</p>
+<h1 class="mb-3">Allowed Emails</h1>
+
+@if (errorMessage()) {
+  <p class="text-danger">Error: {{ errorMessage() }}</p>
+}
+
+<input
+  type="text"
+  class="form-control mb-3 w-100"
+  style="max-width: 320px"
+  placeholder="Search allowed emails..."
+  [value]="search()"
+  (input)="onSearchInput($any($event.target).value)"
+/>
+
+@if (isLoading()) {
+  <p>Loading...</p>
+} @else if (allowedEmails().length === 0) {
+  <p>No allowed emails found.</p>
+} @else {
+  <table class="table table-striped table-bordered">
+    <thead>
+    <tr class="table">
+      <th scope="col">ID</th>
+      <th scope="col">Email</th>
+      <th scope="col">Created At</th>
+      <th></th>
+    </tr>
+    </thead>
+
+    <tbody>
+      @for (allowedEmail of allowedEmails(); track allowedEmail.allowedEmailId) {
+        <tr>
+          <td>{{ allowedEmail.allowedEmailId }}</td>
+          <td>{{ allowedEmail.email }}</td>
+          <td>{{ allowedEmail.createdAt | date: 'short' }}</td>
+          <td>
+            <a [routerLink]="['../allowed-emails', allowedEmail.allowedEmailId]">Details</a>
+            <br />
+            <a [routerLink]="['../allowed-emails/edit', allowedEmail.allowedEmailId]">Edit</a>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @if (pagination(); as p) {
+    <app-pagination
+      [currentPage]="p.pageNumber ?? 1"
+      [totalPages]="p.totalPages ?? 0"
+      [pageSize]="p.pageSize ?? 10"
+      [hasNextPage]="p.hasNextPage ?? false"
+      [hasPreviousPage]="p.hasPreviousPage ?? false"
+      (pageChange)="changePage($event)"
+      (pageSizeChange)="changePageSize($event)" />
+  }
+}
