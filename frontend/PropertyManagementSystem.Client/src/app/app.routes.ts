@@ -16,6 +16,7 @@ import { AllowedEmails } from './components/allowed-emails/allowed-emails/allowe
 import { AllowedEmailDetails } from './components/allowed-emails/allowed-email-details/allowed-email-details';
 import { AllowedEmailsEdit } from './components/allowed-emails/allowed-emails-edit/allowed-emails-edit';
 import { AllowedEmailsCreate } from './components/allowed-emails/allowed-emails-create/allowed-emails-create';
+import { AllowedEmailsDelete } from './components/allowed-emails/allowed-emails-delete/allowed-emails-delete';
 
 export const routes: Routes = [
   {
@@ -98,6 +99,12 @@ export const routes: Routes = [
         canMatch: [adminGuard],
       },
       {
+        path: 'delete/:id',
+        component: AllowedEmailsDelete,
+        title: 'Delete Allowed Email',
+        canMatch: [adminGuard],
+      },
+      {
         path: ':id',
         component: AllowedEmailDetails,
         title: 'Allowed Email Details',
@@ -108,7 +115,7 @@ export const routes: Routes = [
         component: AllowedEmailsEdit,
         title: 'Edit Allowed Email',
         canMatch: [adminGuard],
-      }
-    ]
+      },
+    ],
   },
 ];
