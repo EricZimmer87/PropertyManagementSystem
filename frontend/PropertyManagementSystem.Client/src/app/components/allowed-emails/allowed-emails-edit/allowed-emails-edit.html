@@ -3,8 +3,7 @@
 <form
   class="w-100"
   style="max-width: 320px"
-  [formGroup]="editAllowedEmailForm"
-  (submit)="onSubmit()"
+  (submit)="onSubmit($event)"
 >
   <label class="form-label" for="email">Email:</label>
 
@@ -12,15 +11,12 @@
     class="form-control"
     id="email"
     type="email"
-    formControlName="email"
-    required
+    [formField]="allowedEmailEditForm.email"
   />
 
   <button
     class="btn btn-primary mt-3"
-    type="submit"
-    [disabled]="editAllowedEmailForm.invalid"
-  >
+    type="submit">
     Submit
   </button>
 </form>

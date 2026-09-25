@@ -92,7 +92,7 @@ namespace PropertyManagement.Api.Controllers
         }
 
         // POST /api/allowed-emails/add - create a new allowed email
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<ActionResult<AllowedEmailResponse>> AddAllowedEmail(AddAllowedEmailRequest request)
         {
             var email = request.Email.Trim();
