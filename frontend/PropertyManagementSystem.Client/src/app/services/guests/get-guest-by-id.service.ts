@@ -6,7 +6,7 @@ import { GuestDetailsResponse } from '../../types/guests/guest-details-response.
 @Service()
 export class GetGuestByIdService {
   private http = inject(HttpClient);
-  url = '/api/guests';
+  private readonly url = '/api/guests';
 
   getGuest(id: number): Observable<GuestDetailsResponse> {
     return this.http.get<GuestDetailsResponse>(`${this.url}/${id}`).pipe(

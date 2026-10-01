@@ -4,6 +4,7 @@ import { GetAllowedEmailByIdService } from '../../../services/allowed-emails/get
 import { ActivatedRoute } from '@angular/router';
 import { AllowedEmailDetailsResponse } from '../../../types/allowed-emails/allowed-email-details-response.type';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DeleteAllowedEmailService } from '../../../services/allowed-emails/delete-allowed-email.service';
 
 @Component({
   selector: 'app-allowed-emails-delete',
@@ -16,10 +17,13 @@ export class AllowedEmailsDelete {
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
   private location = inject(Location);
+  private deleteAllowedEmailService = inject(DeleteAllowedEmailService);
 
   allowedEmail = signal<AllowedEmailDetailsResponse | null>(null);
   isLoading = signal<boolean>(true);
   errorMessage = signal<string | null>(null);
+
+  deleteSuccess = signal<boolean>(false);
 
   constructor() {
     this.isLoading.set(true);
@@ -42,7 +46,16 @@ export class AllowedEmailsDelete {
   }
 
   delete() {
-    console.log('Email deleted.');
+    this.deleteAllowedEmailService
+      .deleteAllowedEmail(this.allowedEmail()?.allowedEmailId!)
+      .subscribe({
+        next: (response) => {
+          this.deleteSuccess.set(true);
+        },
+        error: (error) => {
+          this.errorMessage.set(error);
+        },
+      });
   }
 
   goBack(): void {

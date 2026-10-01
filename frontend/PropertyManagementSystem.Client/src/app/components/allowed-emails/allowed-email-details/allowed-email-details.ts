@@ -1,13 +1,13 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GetAllowedEmailByIdService } from '../../../services/allowed-emails/get-allowed-email-by-id.service';
 import { AllowedEmailDetailsResponse } from '../../../types/allowed-emails/allowed-email-details-response.type';
-import { DatePipe } from '@angular/common';
+import { DatePipe, Location } from '@angular/common';
 
 @Component({
   selector: 'app-allowed-email-details',
-  imports: [DatePipe],
+  imports: [DatePipe, RouterLink],
   templateUrl: './allowed-email-details.html',
   styleUrl: './allowed-email-details.css',
 })
@@ -15,6 +15,8 @@ export class AllowedEmailDetails {
   private getAllowedEmailByIdService = inject(GetAllowedEmailByIdService);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
+  private location = inject(Location);
+
   allowedEmail = signal<AllowedEmailDetailsResponse | null>(null);
   isLoading = signal<boolean>(true);
   errorMessage = signal<string | null>(null);
@@ -37,5 +39,9 @@ export class AllowedEmailDetails {
           this.isLoading.set(false);
         },
       });
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }

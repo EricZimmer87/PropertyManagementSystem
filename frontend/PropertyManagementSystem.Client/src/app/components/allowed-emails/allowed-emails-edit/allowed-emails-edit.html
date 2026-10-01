@@ -1,23 +1,40 @@
 <h1>Edit Allowed Email</h1>
 
-<form
-  class="w-100"
-  style="max-width: 320px"
-  (submit)="onSubmit($event)"
->
-  <label class="form-label" for="email">Email:</label>
+@if (errorMessage()) {
+  <p class="text-danger">Error: {{ errorMessage() }}</p>
+}
 
-  <input
-    class="form-control"
-    id="email"
-    type="email"
-    [formField]="allowedEmailEditForm.email"
-  />
+@if (isLoading()) {
+ <p>Loading...</p>
+} @else if(allowedEmail() && !editSuccess()){
+  <form
+    class="w-100"
+    style="max-width: 320px"
+    (submit)="onSubmit($event)"
+  >
+    <label class="form-label" for="email">Email:</label>
 
-  <button
-    class="btn btn-primary mt-3"
-    type="submit">
-    Submit
-  </button>
-</form>
+    <input
+      class="form-control"
+      id="email"
+      type="email"
+      [formField]="allowedEmailEditForm.email"
+    />
 
+    <div class="d-flex mt-3 justify-content-between">
+      <button
+      class="btn btn-primary"
+      type="submit">
+      Submit
+      </button>
+
+      <button class="btn btn-light" (click)="goBack()">Go Back</button>
+    </div>
+
+  </form>
+}
+
+@if (editSuccess()) {
+  <p>Successfully edited the allowed email to <strong>{{ allowedEmail()?.email }}</strong></p>
+  <button class="btn btn-primary" (click)="goBack()">Go Back</button>
+}
